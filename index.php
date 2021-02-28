@@ -20,6 +20,10 @@ include_once(__DIR__ . '/config.php');
     <meta name="author" content="dbwa">
 
     <title>Carte d'invasion</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="manifest" href="./site.webmanifest">
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -29,9 +33,9 @@ include_once(__DIR__ . '/config.php');
 
     <!-- Custom Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
           type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -82,6 +86,7 @@ if (isset($_GET['lng'])) $lng = $_GET['lng'];
 			<!-- pour plus tard -->
 
             <a class="btn btn-primary page-scroll" href="logout.php" title="Se déconnecter"><i class="fa fa-sign-out fa-lg"></i> Se déconnecter </a>
+            <a class="btn btn-primary page-scroll" href="stats.php" title="Mes stats"><i class="fa fa-chart-pie fa-lg"></i> Mes stats </a>
             <div class="col-md-9">
                 <div id="emimapajax" style="width: 100%;height: 600px; margin-top: 10px;"></div>
                 <?php include_once("map/map_emission_ajax.php"); ?>
@@ -98,7 +103,7 @@ if (isset($_GET['lng'])) $lng = $_GET['lng'];
 <!-- Footer -->
 <footer>
     <div class="container text-center">
-        <p><small> v0.1 2021 </small></p>
+        <p><small> v0.2 2021 </small></p>
     </div>
 </footer>
 

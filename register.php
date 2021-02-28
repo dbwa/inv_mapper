@@ -28,26 +28,25 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
     <link href="css/login.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
           type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+          type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 
 
     <!-- jQuery -->
-    <script src="js/jquery.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- pour hash le password -->
     <script src="js/CryptoJS.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <!-- Plugin JavaScript -->
     <script src="js/jquery.easing.min.js"></script>
     <script src="js/jquery.ui.shake.js"></script>
 
-    <!-- Custom Theme JavaScript -->
-    <script src="js/grayscale.js"></script>
 
     <!-- login -->
     <script>
@@ -58,7 +57,7 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
           });
         };
 
-        $(document).ready(function () {
+        $(document).ready(function () {   /*http://192.168.0.10/invaders_dev/register.php?user=test&invit=AAAAA*/
 
             $('#login').click(function () {
                 var username = $("#username").val();
@@ -71,7 +70,7 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
                 } else
                  {   
                     var hashpassword = CryptoJS.SHA1(password).toString();
-                    var dataString = 'username='+ username +'&pass=<?php echo $_GET['invit']; ?>$password='+ hashpassword;
+                    var dataString = 'username='+ username +'&pass=<?php echo $_GET['invi']; ?>&password='+ hashpassword;
                     console.log(dataString);
 
                     if ($.trim(username).length > 0 && $.trim(password).length > 0) {

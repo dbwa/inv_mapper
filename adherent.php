@@ -26,11 +26,11 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
     <link href="css/login.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
           type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
           type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 
 
     <!-- jQuery -->
@@ -44,9 +44,6 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
     <!-- Plugin JavaScript -->
     <script src="js/jquery.easing.min.js"></script>
     <script src="js/jquery.ui.shake.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-<!--     <script src="js/grayscale.js"></script> -->
 
     <!-- login -->
     <script>

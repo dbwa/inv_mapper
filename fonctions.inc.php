@@ -18,7 +18,7 @@ function close()
 // --> UTILISATEUR
 function authentificate($login, $password)
 {
-    $query = "SELECT login, name FROM users WHERE login=$1 AND pwd=$2";
+    $query = "SELECT login, name FROM users WHERE login=$1 AND pwd= encode(digest($2, 'sha1'), 'hex')";
     $params = array($login, $password);
 
     $res = pg_query_params($query, $params);
@@ -27,12 +27,11 @@ function authentificate($login, $password)
     return array($count, $row);
 }
 
-
 // --> CREER L'UTILISATEUR
 function register_user($login, $password, $invitcode)
 {
     $query = "insert into users (login, name, pwd) 
-    select username, username, $1 as pwd 
+    select username, username, encode(digest( $1, 'sha1'), 'hex') as pwd 
     from invit_users 
     where username = $2 and invitcode = $3 and status = 'en attente'";
     $params = array($password, $login, $invitcode);
@@ -47,7 +46,7 @@ function register_user($login, $password, $invitcode)
     $count = pg_num_rows($res);
     $row = pg_fetch_array($res);
 
-    $query = "SELECT login, name FROM users WHERE login=$1 AND pwd=$2";
+    $query = "SELECT login, name FROM users WHERE login=$1 AND pwd=encode(digest($2, 'sha1'), 'hex')";
     $params = array($login, $password);
     $res = pg_query_params($query, $params);
     $count = pg_num_rows($res);
@@ -78,7 +77,7 @@ function get_geojson_a_flasher()
             where 
             pos.lat is not null 
             and pos.lon is not null
-            and coalesce (uf2.etat, et.etat)  = 'OK'
+            and coalesce (uf2.etat, et.etat)  in ('Un peu dégradé','Inconnu','Dégradé','OK')
             and pos.inv_name not in (select uf.inv_name from user_flash as uf where uf.status = 'flash' and uf.user_name=$1)
         )
         select '{\"type\":\"Feature\",\"id\":\"'|| id ||'\",\"geometry\": {\"type\":\"Point\", \"coordinates\":['|| lon || ',' || lat|| ']}, \"properties\":{\"name\":\"'|| inv_name || '\",\"points\":\"'|| points ||'\",\"etat\":\"'|| etat ||'\",\"last_maj\":\"'|| last_maj ||'\",\"image1\":\"'|| image1 ||'\",\"image2\":\"'|| image2 ||'\",\"image3\":\"'|| image3 ||'\"  
@@ -176,7 +175,7 @@ function get_geojson_detruits()
             where 
             pos.lat is not null 
             and pos.lon is not null
-            and coalesce (uf2.etat, et.etat) <> 'OK'
+            and coalesce (uf2.etat, et.etat) not in ('Un peu dégradé','Inconnu','Dégradé','OK')
             and pos.inv_name not in (select uf.inv_name from user_flash as uf where uf.status = 'flash' and uf.user_name=$1)
         )
         select '{\"type\":\"Feature\",\"id\":\"'|| id ||'\",\"geometry\": {\"type\":\"Point\", \"coordinates\":['|| lon || ',' || lat|| ']}, \"properties\":{\"name\":\"'|| inv_name || '\",\"points\":\"'|| points ||'\",\"etat\":\"'|| etat ||'\",\"last_maj\":\"'|| last_maj ||'\",\"image1\":\"'|| image1 ||'\",\"image2\":\"'|| image2 ||'\",\"image3\":\"'|| image3 ||'\"  
@@ -234,7 +233,11 @@ function ajout_flash($inv_name){
     suppri_flash($inv_name);
 
     //puis on l'ajoute
-    $query = "insert into user_flash (user_name, inv_name, status, date_flash) values ($1, $2, 'flash', current_timestamp);";
+    $query = " INSERT INTO user_flash (user_name, inv_name, status, date_flash)
+     SELECT $1, $2, 'flash', current_timestamp as date_flash
+     WHERE NOT EXISTS (SELECT inv_name FROM user_flash WHERE user_name = $1 and inv_name = $2)
+     and EXISTS (select inv_name from etat where inv_name = $2)
+    ";
     $params = array($_SESSION['login_name'], $inv_name);
     $res = pg_query_params($query, $params);
     $data = pg_fetch_all($res);   
