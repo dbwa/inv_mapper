@@ -14,6 +14,18 @@ include_once(__DIR__ . "/postgis_geojson.php");
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 
+
+<!--Plugins pour la geolocalisation-->
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.mapbox.css' rel='stylesheet' />
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/css/font-awesome.min.css' rel='stylesheet' />
+
+<style>
+  .leaflet-control-locate a {
+      padding: 0 0 0 0;
+  }
+</style>
+
 <script type="text/javascript">
     //    Récupération des variables PHP en Javascript
 
@@ -61,7 +73,7 @@ include_once(__DIR__ . "/postgis_geojson.php");
 	        	+'nbr de pts : ' + feature.properties.points + "<br>"
 	        	+'etat : ' + feature.properties.etat + "<br>" 
 	        	+'last maj : ' + feature.properties.last_maj + "<br>" 
-                +'<input name="to_flash" class="btn btn-success" value="Je l\'ai !" onclick=click_to_flash("' + feature.properties.name +'") /> <input name="to_detruit" class="btn btn-warning" value="Déclarer detruit" onclick=click_to_detruit("' + feature.properties.name +'") />' ,
+                +'<input name="to_flash" class="btn btn-success" value="Je l\'ai !" onclick=click_to_flash("' + feature.properties.name +'") readonly /> <input name="to_detruit" class="btn btn-warning" value="Déclarer detruit" onclick=click_to_detruit("' + feature.properties.name +'") readonly />' ,
 	        	{maxHeight: 300, maxWidth:200});  //taille du pop up
 	    }
 
@@ -77,7 +89,7 @@ include_once(__DIR__ . "/postgis_geojson.php");
                 +'nbr de pts : ' + feature.properties.points + "<br>"
                 +'etat : ' + feature.properties.etat + "<br>" 
                 +'last maj : ' + feature.properties.last_maj + "<br>" 
-                +'<input name="to_flash" class="btn btn-dark" value="Je l\'ai pas" onclick=click_to_NON_flash("' + feature.properties.name +'") /> <input name="to_detruit" class="btn btn-warning" value="Déclarer detruit" onclick=click_to_detruit("' + feature.properties.name +'") />' ,
+                +'<input name="to_flash" class="btn btn-dark" value="Je l\'ai pas" onclick=click_to_NON_flash("' + feature.properties.name +'") readonly /> <input name="to_detruit" class="btn btn-warning" value="Déclarer detruit" onclick=click_to_detruit("' + feature.properties.name +'") readonly />' ,
                 {maxHeight: 400, maxWidth:250});  //taille du pop up
         }
 
@@ -93,7 +105,7 @@ include_once(__DIR__ . "/postgis_geojson.php");
                 +'nbr de pts : ' + feature.properties.points + "<br>"
                 +'etat : ' + feature.properties.etat + "<br>" 
                 +'last maj : ' + feature.properties.last_maj + "<br>" 
-                +'<input name="to_detruit" class="btn btn-primary" value="Déclarer non detruit" onclick=click_to_reactive("' + feature.properties.name +'") />' ,
+                +'<input name="to_detruit" class="btn btn-primary" value="Déclarer non detruit" onclick=click_to_reactive("' + feature.properties.name +'") readonly />' ,
                 {maxHeight: 400, maxWidth:250});  //taille du pop up
         }
 
@@ -161,6 +173,7 @@ include_once(__DIR__ . "/postgis_geojson.php");
 
     function click_to_NON_flash(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&flash=faux';
+        console.log(dataString);
         $.ajax({
             type: "POST",
             url: "maj_click/maj_flash.php",
@@ -221,28 +234,15 @@ include_once(__DIR__ . "/postgis_geojson.php");
     };
 
     var Lcontrol = L.control.layers(null,baseMaps, {collapsed:true}).addTo(map);
-    L.Control.Layers.include({  //ajout de fonction pour savoir qui est allumé/eteint avec "Lcontrol.getOverlays();""
-      getOverlays: function() {
-        // create hash to hold all layers
-        var control, layers;
-        layers = {};
-        control = this;
-        // loop thru all layers in control
-        control._layers.forEach(function(obj) {
-          var layerName;
-          // check if layer is an overlay
-          if (obj.overlay) {layerName = obj.name;
-            return layers[layerName] = control._map.hasLayer(obj.layer);
-          } });
-        return layers;
-      }});
 
-
-
-
-
-
-
+    /*geolocalisation*/
+    /*Attention : necessite une connexion https pour que les navigateurs acceptent le partage*/
+    var geoloc = L.control.locate({position: 'topleft',
+      flyTo:'true',
+      /*showCompass : 'true',*/
+       locateOptions: {
+               enableHighAccuracy: true
+      }}).addTo(map);
 
 
 </script>

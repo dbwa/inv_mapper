@@ -6,11 +6,12 @@ error_reporting(E_ALL);
 session_start();
 include_once(__DIR__ . "/fonctions.inc.php");
 connect();
-if (isSet($_POST['username']) && isSet($_POST['password'])) {
+
+if (isSet($_POST['username']) && isSet($_POST['password']) && isSet($_POST['pass'])) {
+    
     $username = $_POST['username'];
     $password = $_POST['password'];
     $pass = $_POST['pass'];  //le code donné en ammont
-
     list($count, $row) = register_user($username, $password, $pass);
 
 
