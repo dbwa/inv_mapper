@@ -1,5 +1,4 @@
 <?php
-// Attribution pour le pied de carte
 
 include_once(__DIR__ . "/postgis_geojson.php");
 
@@ -244,5 +243,6 @@ include_once(__DIR__ . "/postgis_geojson.php");
                enableHighAccuracy: true
       }}).addTo(map);
 
+    var attrib = map.attributionControl.addAttribution('Carte d\'invasion; v0.2.1 2021');
 
 </script>

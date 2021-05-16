@@ -21,6 +21,8 @@ label {
     color: #333;
     border: 1px solid #e5e5e5;
     box-shadow: rgba(200, 200, 200, 0.7) 0 4px 10px -1px;
+
+
 }
 
 .input {
@@ -67,11 +69,6 @@ label {
     -webkit-box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
     -moz-box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
     box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
-}
-
-.button-primary {
-    background-color: #5fcf80 !important;
-    border-color: #3ac162 !important;
 }
 
 .msg {

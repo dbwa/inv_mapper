@@ -54,13 +54,26 @@ connect();
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
 
 	<style>
+
 		body {
+			background-color:#121212;
 		    font-family: Arial;
 		    width: 550px;
 		}
 
+		h2, h3, h4{color:#FFA518;}
+
+		.modal-content {
+		    background: #343434;
+		    color:#fff;
+		    border: #e0dfdf 1px solid;
+		    padding: 20px;
+		    border-radius: 2px;
+		}
+
 		.outer-scontainer {
-		    background: #F0F0F0;
+		    background: #343434;
+		    color:#fff;
 		    border: #e0dfdf 1px solid;
 		    padding: 20px;
 		    border-radius: 2px;
@@ -162,6 +175,31 @@ connect();
 		  color: gray;
 		}
 
+        /*boutons*/
+        .btn.btn-primary.btn-outline-primary{border-width:2px;cursor:pointer}
+        .btn.btn-outline-white{border:2px solid #fff;background:none;color:#fff;text-decoration:none}
+        .btn.btn-outline-white:hover{background:#FFA518;color:#000;border:2px solid transparent}
+
+        .btn-outline-orange{border:2px solid #FFA518;background:none;color:#fff;text-decoration:none}
+        .btn-outline-orange:hover{background:#FFA518;color:#000;border:2px solid transparent}
+
+		.btn-primary{border:2px solid #00b8ff;background:none;color:#fff;text-decoration:none; padding:1px; margin-right: 2px; margin-bottom: 1px}
+		.btn-warning, .btn-default{border:2px solid #f0ad4e;background:none;color:#fff;text-decoration:none; padding:1px; margin-right: 2px; margin-bottom: 1px}
+		.btn-dark{border:2px solid #7aff00;background:none;color:#fff;text-decoration:none; padding:1px; margin-right: 2px; margin-bottom: 1px}
+
+		#myBtn, .page-scroll {border:2px solid #00b8ff;background:none;color:#fff;text-decoration:none; padding:5px 15px 5px; margin-right: 15px}
+
+		.modal-content .btn {padding:5px 15px 5px; margin-right: 5px}
+
+        /*footer*/
+        .ftco-footer{background:#121212;padding:7em 0;font-size:15px;font-weight:400}
+        .ftco-footer .footer-widget h3{font-size:20px;color:#FFA518}
+        .ftco-footer .btn {font-size:20px;color:#ffe2e6;font-size: small}
+        .footer-widget{padding: 0px 25px 25px;}
+
+        /*autres*/
+        .ct-label{color:#000; font-size: small; font-weight: bold; font-family: Montserrat}
+
 	</style>
 	<script type="text/javascript">
 	    /*pour mettre a jour le tableau des flash en entier*/
@@ -244,6 +282,24 @@ connect();
         });
    		}
 
+	    function click_to_flash_multi(list_inv_name) {
+        $.ajax({
+			url:'maj_click/ajout_flash_multi.php',
+			method:'POST',
+			dataType: 'json',
+			 processData: false,
+			contentType: 'application/json',
+			data:JSON.stringify({
+			    "inv_names":list_inv_name
+			 }),
+			 success: function (reponse) {
+                //netoyage puis reapplication
+           	}
+
+			});
+   		}
+
+
 		/*Envoyer les listes vers le serveur*/
 		function ajout_flash_depuis_liste(){
 			$("#loading").show();
@@ -255,13 +311,9 @@ connect();
 			 txt_liste_inv = txt_liste_inv.replaceAll("<br>", "");
 			 txt_liste_inv = txt_liste_inv.replaceAll(",,", ",");
 			 console.log(txt_liste_inv);
-			 liste_inv = txt_liste_inv.split(',')
-			 /*envoie de chaque elem de la liste vers le ajax d'ajout dans la base*/
-			 liste_inv.forEach((item, index) => {
-/*				  console.log(item); //value
-				  console.log(index);*/
-				  click_to_flash(item);
-				});
+
+			 //envoie d'une page entiere d'elements vers la base, qui se debrouille ensuite pour couper et crer la table
+			 click_to_flash_multi(txt_liste_inv);
 
 			 /*refresh de la page pour voir les resultats*/
 			 location.reload();
@@ -371,12 +423,43 @@ connect();
 
 
 <!-- Footer -->
-<footer>
-    <div class="container text-center">
-        <p><small> v0.2 2021 </small></p>
-    </div>
-</footer>
 
+<footer class="ftco-footer">
+<div class="container">
+<div class="row">
+<div class="col-md-6 mb-6">
+
+<div class="footer-widget">
+
+<h3 class="mb-4">A propos</h3>
+<p>Invaders mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
+<p><a href="https://play.google.com/store/apps/details?id=com.ltu.flashInvader&hl=fr" class="btn btn-outline-orange">Télécharger l'application</a></p>
+
+</div>
+</div>
+
+
+<div class="col-md-6">
+<div class="footer-widget">
+<h3 class="mb-4">Suivre le projet </h3>
+
+<p><a href="https://github.com/dbwa/inv_mapper"><span class="fa fa-github"></span><small> inv_mapper</small></a></p>
+
+</div>
+
+</div>
+</div>
+<div class="row fin">
+<div class="col-md-12 text-center">
+<p>
+
+v0.3.1 <script>document.write(new Date().getFullYear());</script> Invaders Mapper
+
+</p>
+</div>
+</div>
+</div>
+</footer>
 
 </body>
 

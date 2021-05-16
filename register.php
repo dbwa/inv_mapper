@@ -47,6 +47,40 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
     <script src="js/jquery.easing.min.js"></script>
     <script src="js/jquery.ui.shake.js"></script>
 
+   <style type="text/css">
+        
+        /*disposition*/
+        .vertical-center{margin: 0; position: absolute; top: 50%; left: 50%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%)}
+        p{font-size: medium}
+
+        .fin{margin-top: 62px}
+
+        #box{border:2px solid #FFA518; background:#000; color:#fff; text-decoration:none; opacity:90%; border-radius:4px;}
+        #box h3{color:#FFA518;}
+        #box label{color:#FFA518;}
+        .input{width: 100%;  background:#555; border-radius:4px;}
+
+        .button-orange{border:2px solid #FFA518;background:#FFA518; color:#000; text-decoration:none; opacity:100%; border-radius:4px;}
+
+        /*grande image*/
+        .cover_1 .img_bg{background-repeat:no-repeat;background-size:cover!important;background-position:center center}
+        .cover_1 .img_bg,.cover_1 {min-height:600px;height:100vh} 
+        .cover_1 .heading{color:#fff;font-weight:300;font-size:30px;line-height:1.5} 
+
+        /*boutons*/
+        .btn.btn-primary.btn-outline-primary{border-width:2px;cursor:pointer}
+        .btn.btn-outline-white{border:2px solid #fff;background:none;color:#fff;text-decoration:none}
+        .btn.btn-outline-white:hover{background:#FFA518;color:#000;border:2px solid transparent}
+
+        .btn-outline-orange{border:2px solid #FFA518;background:none;color:#fff;text-decoration:none}
+        .btn-outline-orange:hover{background:#FFA518;color:#000;border:2px solid transparent}
+
+        /*footer*/
+        .ftco-footer{background:#121212;padding:7em 0;font-size:15px;font-weight:400}
+        .ftco-footer .footer-widget h3{font-size:20px;color:#FFA518}
+        .ftco-footer .btn {font-size:20px;color:#ffe2e6;font-size: small}
+        .footer-widget{padding: 0px 25px 25px;}
+    </style>
 
     <!-- login -->
     <script>
@@ -107,10 +141,17 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
 
 
 </head>
+<div class="site-wrap">
 
-        <br>
+<div class="main-wrap " id="section-home">
+<div class="cover_1 overlay bg-light">
+<div class="img_bg" style="background-image: url(https://images.pexels.com/photos/2603464/pexels-photo-2603464.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260); background-position: 50% -25px;" data-stellar-background-ratio="0.5">
+<div id="vertical-center">
+<div class="row align-items-center justify-content-center text-center vertical-center">
+
+
         <div id="box">
-        <h4>Creer un compte</h4>
+        <h3>Creer un compte</h3>
             <form action="" method="post">
                 <label>Login</label>
                 <input type="text" name="username" class="input" autocomplete="off" id="username" value="<?php echo $_GET['user']; ?>"/>
@@ -118,7 +159,7 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
                 <input type="password" name="password" class="input" autocomplete="off" id="password"/><br/>
                 <label>Repeter le mot de passe </label>
                 <input type="password" name="password2" class="input" autocomplete="off" id="password2"/><br/>
-                <input type="submit" class="button button-primary" value="Se connecter" id="login"/>
+                <input type="submit" class="button button-primary button-orange" value="Se connecter" id="login"/>
                 <span class='msg'></span>
                 <div id="error">
 
@@ -127,15 +168,52 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
         </div>
         </form>
     </div>
+</div>
+</div>
+</div>
+</div> 
 
 
-<!-- Footer -->
-<footer>
-    <div class="container text-center">
-        <p><small> v0.1 2021 </small></p>
-    </div>
+
+<footer class="ftco-footer">
+<div class="container">
+<div class="row">
+<div class="col-md-6 mb-6">
+
+<div class="footer-widget">
+
+<h3 class="mb-4">A propos</h3>
+<p>Invaders mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
+<p><a href="https://play.google.com/store/apps/details?id=com.ltu.flashInvader&hl=fr" class="btn btn-outline-orange">Télécharger l'application</a></p>
+
+</div>
+</div>
+
+
+<div class="col-md-6">
+<div class="footer-widget">
+<h3 class="mb-4">Suivre le projet </h3>
+
+<p><a href="https://github.com/dbwa/inv_mapper"><span class="fa fa-github"></span><small> inv_mapper</small></a></p>
+
+</div>
+
+</div>
+</div>
+<div class="row fin">
+<div class="col-md-12 text-center">
+<p>
+
+v0.3.1 <script>document.write(new Date().getFullYear());</script> Invaders Mapper
+
+</p>
+</div>
+</div>
+</div>
 </footer>
+</div>
 
+</div>
 
 </body>
 

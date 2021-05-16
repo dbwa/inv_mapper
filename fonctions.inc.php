@@ -244,4 +244,22 @@ function ajout_flash($inv_name){
     return 1;
 }
 
+function ajout_flash_multi($list_inv_name){
+    //ajout d'un paquet de nouveaux flash par un user dans la base user_flash (on ajoute que ceux ui n y sont pas deja, et qui existe vraiment)
+    $query = " 
+    WITH lst AS (
+        SELECT inv_names from regexp_split_to_table($2, ',') AS inv_names
+        WHERE inv_names NOT IN (SELECT inv_name FROM user_flash WHERE user_name = $1) and inv_names IN (SELECT inv_name from etat)
+    )
+    INSERT INTO user_flash (user_name, inv_name, status, date_flash)
+        SELECT $1, inv_names, 'flash', current_timestamp AS date_flash from lst
+    ";
+
+    $params = array($_SESSION['login_name'], $list_inv_name);
+    $res = pg_query_params($query, $params);
+    $data = pg_fetch_all($res);   
+    return 1;
+    }
+
+
 ?>
