@@ -23,7 +23,7 @@ Modifiez le fichier config.php afin de le lier à la base de données, puis ajou
 
 # Préparation des données
 
-Les données de sont pas fournies avec l'outil. Il revient à l'utilisateur de trouver les positions des invaders, de remplir les bases, de mettre à jour la distinction des invaders en bon état ou détruit, etc.
+Les données de sont pas fournies avec l'outil. Il revient à l'utilisateur de trouver les positions des invaders, trouver les photos, de remplir les bases, de mettre à jour la distinction des invaders en bon état ou détruit, etc.
 
 ## Ajouter des utilisateurs
 
