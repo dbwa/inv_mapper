@@ -1,0 +1,33 @@
+# Donnees et fichiers generes : jamais versionnes
+
+# Scripts d'administration et de synchronisation (contiennent des identifiants)
+scripts/
+*.py
+*.sh
+
+# Images : donnees utilisateurs et fonds d'images volumineux
+img_invader/*
+!img_invader/nav/
+img/user_img/
+user_img/
+
+# Fonds de carte et donnees geographiques telechargees
+wfs/
+test_holo/
+
+# Caches applicatifs
+cache/
+iss/cache/
+map/cache/
+
+# Bibliotheques tierces
+iss/lib/
+
+# Fichiers systeme et temporaires
+Thumbs.db
+__pycache__/
+*.pyc
+*.log
+
+# Configuration serveur
+.well-known/
