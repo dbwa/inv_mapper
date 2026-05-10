@@ -1,13 +1,37 @@
 <?php
 include_once(__DIR__ . '/config.php');
+include_once("fonctions.inc.php");
 session_start();
-if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers page membre
+
+// Vérifier d'abord le cookie de connexion
+restore_session_from_cookie();
+
+if (!empty($_SESSION['login_user'])) {
     header('Location: index.php');
+    exit();
+}
+
+// Traitement du formulaire de connexion
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $remember = isset($_POST['remember']) ? true : false;
+    
+    $auth_result = authentificate($username, $password, $remember);
+    if ($auth_result && is_array($auth_result)) {
+        list($count, $user) = $auth_result;
+        $_SESSION['login_user'] = $user['login'];
+        $_SESSION['login_name'] = $user['name'];
+        $_SESSION['user_type'] = $user['user_type'];
+        header("location: index.php");
+        exit();
+    } else {
+        $error = "Nom d'utilisateur ou mot de passe incorrect";
+    }
 }
 ?>
 <!DOCTYPE html>
 <html lang="fr">
-<?php include_once("fonctions.inc.php"); ?>
 <head>
 
     <meta charset="utf-8">
@@ -84,41 +108,69 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
     <!-- login -->
     <script>
         $(document).ready(function () {
-
-            $('#login').click(function () {
+            $('form.form-signin').on('submit', function (e) {
+                e.preventDefault();
                 var username = $("#username").val();
-                var password = CryptoJS.SHA1($("#password").val()).toString();  /*on hash le password une premiere fois ici*/
-                var dataString = 'username=' + username + '&password=' + password;
+                var password = CryptoJS.SHA1($("#password").val()).toString();
+                var remember = $("#remember").prop('checked');
+                
+                console.log("Tentative de connexion pour:", username);
+                console.log("Remember me:", remember);
+                
                 if ($.trim(username).length > 0 && $.trim(password).length > 0) {
-
-
+                    var data = {
+                        username: username,
+                        password: password,
+                        remember: remember
+                    };
+                    
+                    console.log("Envoi des données:", data);
+                    
                     $.ajax({
                         type: "POST",
                         url: "ajaxLogin.php",
-                        data: dataString,
-                        cache: false,
+                        contentType: "application/json",
+                        data: JSON.stringify(data),
                         beforeSend: function () {
-                            $("#login").val('Connection...');
+                            $("#login").prop('disabled', true).text('Connection...');
+                            $("#error").html("");
                         },
-                        success: function (data) {
-                            if (data) {
-                                window.location.href = "index.php";
-                            }
-                            else {
+                        success: function (response) {
+                            console.log("Réponse reçue:", response);
+                            try {
+                                if (typeof response === 'string') {
+                                    response = JSON.parse(response);
+                                }
+                                
+                                if (response.success) {
+                                    window.location.href = "index.php";
+                                } else {
+                                    $('#box').shake();
+                                    $("#error").html("<span style='color:#ff0000'><b>Erreur:</b></span> " + (response.message || "Erreur inconnue"));
+                                }
+                            } catch (e) {
+                                console.error("Erreur parsing JSON:", e);
                                 $('#box').shake();
-                                $("#login").val('Se connecter');
-                                $("#error").html("<span style='color:#ff0000'><b>Erreur:</b></span> Login/Mot de passe incorrect. ");
+                                $("#error").html("<span style='color:#ff0000'><b>Erreur:</b></span> Réponse invalide du serveur");
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Erreur AJAX:", status, error);
+                            console.log("Réponse:", xhr.responseText);
+                            $('#box').shake();
+                            $("#error").html("<span style='color:#ff0000'><b>Erreur:</b></span> Erreur de connexion au serveur");
+                        },
+                        complete: function() {
+                            $("#login").prop('disabled', false).text('Se connecter');
                         }
                     });
-
+                } else {
+                    $("#error").html("<span style='color:#ff0000'><b>Erreur:</b></span> Veuillez remplir tous les champs");
                 }
-                return false;
             });
-
-
         });
     </script>
+
 
 
 </head>
@@ -156,21 +208,37 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
             </div>
         '; } ?>
 
+                <?php if (isset($_GET['compte_supprime'])) { ?>
+            <div class="alert alert-success" role="alert">
+                <strong>Votre compte a été supprimé.</strong><br>
+                Il est désormais inaccessible et vous avez été déconnecté.
+                Vos données seront définitivement effacées sous 30 jours.
+                D'ici là, ce nom d'utilisateur reste réservé et ne peut pas être réutilisé
+                pour créer un nouveau compte.
+            </div>
+                <?php } ?>
+
             <br>
-            <form action="" method="post">
-                <label>Login</label>
-                <input type="text" name="username" class="input" autocomplete="off" id="username"/>
-                <label>Password </label>
-                <input type="password" name="password" class="input" autocomplete="off" id="password"/><br/>
-                <input type="submit" class="button button-primary button-orange" value="Se connecter" id="login"/>
-                <span class='msg'></span>
-
-                <div id="error">
-
+            <form class="form-signin" method="post">
+                <h2 class="form-signin-heading">Connexion</h2>
+                <?php if(isset($error)) { echo "<div class='alert alert-danger'>$error</div>"; } ?>
+                <input style="margin-bottom: 10px;" type="text" id="username" class="form-control" name="username" placeholder="Nom d'utilisateur" required autofocus>
+                <input style="margin-bottom: 10px;" type="password" id="password" class="form-control" name="password" placeholder="Mot de passe" required>
+                <div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" id="remember" name="remember" value="1"> Se souvenir de moi
+                    </label>
                 </div>
+                <button class="btn btn-lg btn-primary btn-block" id="login" type="submit">Se connecter</button>
+                <div id="error"></div>
+            </form>
 
+            <p class="text-center" style="margin-top: 20px;">
+                <a href="register.php" class="btn btn-outline-white" style="opacity:0.7;">
+                    <small>Créer un compte</small>
+                </a>
+            </p>
         </div>
-        </form>
     </div>
 
 
@@ -192,7 +260,8 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
 <div class="footer-widget">
 
 <h3 class="mb-4">A propos</h3>
-<p>Invaders mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
+<p>Invader mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
+<br>
 <p><a href="https://play.google.com/store/apps/details?id=com.ltu.flashInvader&hl=fr" class="btn btn-outline-orange">Télécharger l'application</a></p>
 
 </div>
@@ -203,7 +272,9 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
 <div class="footer-widget">
 <h3 class="mb-4">Suivre le projet </h3>
 
-<p><a href="https://github.com/dbwa/inv_mapper"><span class="fa fa-github"></span><small> inv_mapper</small></a></p>
+<p><a href="https://github.com/dbwa/inv_mapper"><span class="fa fa-github"></span> inv_mapper</a></p>
+<br>
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#eb750e', 'I3I6KLTIW');kofiwidget2.draw();</script> 
 
 </div>
 
@@ -213,7 +284,7 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
 <div class="col-md-12 text-center">
 <p>
 
-v0.3.1 <script>document.write(new Date().getFullYear());</script> Invaders Mapper
+v0.3.1 <script>document.write(new Date().getFullYear());</script> Invader Mapper
 
 </p>
 </div>
