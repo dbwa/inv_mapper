@@ -1,10 +1,19 @@
 <?php
-// cette page prend en entrée un code d'invitation 'invit' et le username invité 'user' associé
+// cette page prend en entrÃ©e un code d'invitation 'invit' et le username invitÃ© 'user' associÃ©
 include_once(__DIR__ . '/config.php');
 session_start();
 if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers page membre
     header('Location: index.php');
 }
+
+// Si aucun code d'invitation n'est configuré, l'inscription est ouverte à tous
+// et le champ correspondant est masqué.
+$code_requis = isset($code_inscription) ? (string) $code_inscription : '';
+$inscription_ouverte = ($code_requis === '');
+
+// Valeurs pré-remplies depuis l'URL (absentes si on arrive directement sur la page)
+$prefill_user = isset($_GET['user']) ? $_GET['user'] : '';
+$prefill_invi = isset($_GET['invi']) ? $_GET['invi'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -97,6 +106,7 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
                 var username = $("#username").val();
                 var password = $("#password").val();
                 var password2 = $("#password2").val();
+                var invit_code = $("#invit_code").val();
 
                 if (password2 != password) {
                     $('#box').shake();
@@ -104,28 +114,34 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
                 } else
                  {   
                     var hashpassword = CryptoJS.SHA1(password).toString();
-                    var dataString = 'username='+ username +'&pass=<?php echo $_GET['invi']; ?>&password='+ hashpassword;
-                    console.log(dataString);
+                    var dataString = 'username='+ username +'&pass='+ invit_code + '&password='+ hashpassword;
 
                     if ($.trim(username).length > 0 && $.trim(password).length > 0) {
 
 
                         $.ajax({
-                            type: "POST",
+                            type: "GET",
                             url: "AjaxRegister.php",
                             data: dataString,
                             cache: false,
                             beforeSend: function () {
-                                $("#login").val('Connection...');
+                                $("#login").val('Enregistrement...');
                             },
                             success: function (data) {
                                 if (data) {
-                                    window.location.href = "adherent.php?register=success";
+                                    if (data == 'user exists'){
+                                   		$('#box').shake();
+                                    	$("#login").val('S\'enregistrer');
+                                    	$("#error").html("<span style='color:#cc0000'>Erreur:</span> Cet utilisateur existe dÃ©jÃ .");
+                        			}
+                                    else if (data == username){
+	                                    window.location.href = "./adherent.php?register=success";
+                                    }
                                 }
                                 else {
                                     $('#box').shake();
-                                    $("#login").val('Se connecter');
-                                    $("#error").html("<span style='color:#cc0000'>Erreur:</span> Ce login n'a pas été invité. ");
+                                    $("#login").val('S\'enregistrer');
+                                    $("#error").html("<span style='color:#cc0000'>Erreur:</span> Ce login et/ou ce code d'invitation n'existe pas, ou ne sont pas associÃ©s. ");
                                 }
                             }
                         });
@@ -154,12 +170,20 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
         <h3>Creer un compte</h3>
             <form action="" method="post">
                 <label>Login</label>
-                <input type="text" name="username" class="input" autocomplete="off" id="username" value="<?php echo $_GET['user']; ?>"/>
+                <input type="text" name="username" class="input" autocomplete="off" id="username" value="<?php echo htmlspecialchars($prefill_user); ?>"/>
                 <label>Mot de passe </label>
                 <input type="password" name="password" class="input" autocomplete="off" id="password"/><br/>
-                <label>Repeter le mot de passe </label>
+                <label>Répéter le mot de passe </label>
                 <input type="password" name="password2" class="input" autocomplete="off" id="password2"/><br/>
-                <input type="submit" class="button button-primary button-orange" value="Se connecter" id="login"/>
+                <?php if (!$inscription_ouverte): ?>
+                <label>Code d'invitation </label>
+                <input type="text" name="invit_code" class="input" autocomplete="off" id="invit_code" value='<?php echo htmlspecialchars($prefill_invi); ?>'/><br/>
+                <?php else: ?>
+                <input type="hidden" name="invit_code" id="invit_code" value=""/>
+                <?php endif; ?>
+                <input type="submit" class="button button-primary button-orange" value="S'enregistrer" id="login"/>
+                <a href="adherent.php" class="smoothscroll btn btn-outline-black">J'ai dÃ©jÃ  un compte</a>
+
                 <span class='msg'></span>
                 <div id="error">
 
@@ -184,7 +208,7 @@ if (!empty($_SESSION['login_user'])) { //la session est bonne on redirige vers p
 
 <h3 class="mb-4">A propos</h3>
 <p>Invaders mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
-<p><a href="https://play.google.com/store/apps/details?id=com.ltu.flashInvader&hl=fr" class="btn btn-outline-orange">Télécharger l'application</a></p>
+<p><a href="https://play.google.com/store/apps/details?id=com.ltu.flashInvader&hl=fr" class="btn btn-outline-orange">TÃ©lÃ©charger l'application</a></p>
 
 </div>
 </div>

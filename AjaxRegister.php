@@ -7,13 +7,12 @@ session_start();
 include_once(__DIR__ . "/fonctions.inc.php");
 connect();
 
-if (isSet($_POST['username']) && isSet($_POST['password']) && isSet($_POST['pass'])) {
-    
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $pass = $_POST['pass'];  //le code donné en ammont
-    list($count, $row) = register_user($username, $password, $pass);
+if (isSet($_GET['username']) && isSet($_GET['password']) && isSet($_GET['pass'])) {
 
+    $username = $_GET['username'];
+    $password = $_GET['password'];
+    $pass = $_GET['pass'];  //le code donné en ammont
+    list($count, $row) = register_user($username, $password, $pass);
 
     if ($count == 1) {
         $_SESSION['login_user'] = '';
