@@ -1,0 +1,22 @@
+# .htaccess dans /map/
+
+php_value max_execution_time 30
+
+RewriteEngine On
+RewriteBase /map/
+
+# Règle 1: Si la tuile existe dans le cache, la servir directement
+# On capture les paramètres
+RewriteCond %{QUERY_STRING} ^layer=([^&]+)&z=([^&]+)&x=([^&]+)&y=([^&]+)
+# On vérifie si le fichier de cache existe
+RewriteCond %{DOCUMENT_ROOT}/map/cache/tiles/%1/%2/%3/%4.png -f
+# Si oui, on réécrit vers le fichier statique et on arrête
+RewriteRule ^tile_proxy\.php$ cache/tiles/%1/%2/%3/%4.png [L]
+
+# Règle 2: Si la tuile N'EXISTE PAS dans le cache, réécrire vers le script PHP
+# On capture les paramètres (même si on ne les utilise pas directement ici, c'est pour la cohérence)
+RewriteCond %{QUERY_STRING} ^layer=([^&]+)&z=([^&]+)&x=([^&]+)&y=([^&]+)
+# On vérifie si le fichier de cache N'EXISTE PAS
+RewriteCond %{DOCUMENT_ROOT}/map/cache/tiles/%1/%2/%3/%4.png !-f
+# Si non, on réécrit vers le script PHP (qui va le générer) et on arrête
+RewriteRule ^tile_proxy\.php$ tile_proxy.php [L]
