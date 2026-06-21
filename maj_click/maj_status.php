@@ -7,8 +7,8 @@ connect();
 session_start();
 
 // Recuperation des variables POST
-$inv_name = $_POST['inv_name'];
-$statusout = $_POST['statusout'];
+$inv_name = $_GET['inv_name'];
+$statusout = $_GET['statusout'];
 
 #update du status de l'invader
 update_status($inv_name, $statusout);
