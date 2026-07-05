@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html lang="fr">
-
 <?php
 session_start();
 include_once(__DIR__ . '/config.php');
 include_once("./fonctions.inc.php");
 
 // utilisez cela pour debeugger:
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 connect();
 ?>
+
+<!DOCTYPE html>
+<html lang="fr">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -20,7 +20,7 @@ connect();
     <meta name="description" content="">
     <meta name="author" content="dbwa">
 
-    <title>Carte d'invasion</title>
+    <title>Carte d'invasion - Stats et Tableaux</title>
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
@@ -52,11 +52,15 @@ connect();
     <!-- pour faire les graphs -->
     <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+    <!-- pour exporter les données -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
 
 	<style>
 
 		body {
-			background-color:#121212;
+			background-color:#223;
 		    font-family: Arial;
 		    width: 550px;
 		}
@@ -192,7 +196,7 @@ connect();
 		.modal-content .btn {padding:5px 15px 5px; margin-right: 5px}
 
         /*footer*/
-        .ftco-footer{background:#121212;padding:7em 0;font-size:15px;font-weight:400}
+        .ftco-footer{background:#223;padding:7em 0;font-size:15px;font-weight:400}
         .ftco-footer .footer-widget h3{font-size:20px;color:#FFA518}
         .ftco-footer .btn {font-size:20px;color:#ffe2e6;font-size: small}
         .footer-widget{padding: 0px 25px 25px;}
@@ -222,7 +226,7 @@ connect();
 	        var dataString = 'inv_name=' + inv_name + '&flash=faux';
 	        console.log(dataString);
 	        $.ajax({
-	            type: "POST",
+	            type: "GET",
 	            url: "maj_click/maj_flash.php",
 	            data: dataString,
 	            cache: false,
@@ -246,7 +250,7 @@ connect();
 	    function click_to_detruit(inv_name) {
 	        var dataString = 'inv_name=' + inv_name + '&statusout=detruit';
 	        $.ajax({
-	            type: "POST",
+	            type: "GET",
 	            url: "maj_click/maj_status.php",
 	            data: dataString,
 	            cache: false,
@@ -259,7 +263,7 @@ connect();
 	    function click_to_reactive(inv_name) {
 	        var dataString = 'inv_name=' + inv_name + '&statusout=OK';
 	        $.ajax({
-	            type: "POST",
+	            type: "GET",
 	            url: "maj_click/maj_status.php",
 	            data: dataString,
 	            cache: false,
@@ -272,7 +276,7 @@ connect();
 	    function click_to_flash(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&flash=vrai';
         $.ajax({
-            type: "POST",
+            type: "GET",
             url: "maj_click/maj_flash.php",
             data: dataString,
             cache: false,
@@ -282,26 +286,38 @@ connect();
         });
    		}
 
-	    function click_to_flash_multi(list_inv_name) {
-        $.ajax({
-			url:'maj_click/ajout_flash_multi.php',
-			method:'POST',
-			dataType: 'json',
-			 processData: false,
-			contentType: 'application/json',
-			data:JSON.stringify({
-			    "inv_names":list_inv_name
-			 }),
-			 success: function (reponse) {
-                //netoyage puis reapplication
-           	}
+		function click_to_flash_multi(list_inv_name) {
+			var dataString = 'inv_names=' + list_inv_name ;
+		    $.ajax({
+		        url: 'maj_click/ajout_flash_multi.php', 
+		        method: 'GET',
+		        data: dataString,
+	            cache: false,
+		        success: function (reponse) {
+			        	reponse = JSON.parse(reponse);
+		                var insertedCount = reponse.insertedCount;
+					    if (insertedCount > 0) {
+					        alert(insertedCount + " invader(s) inséré(s) avec succès");
+					        location.reload();
+					    } else {
+					        alert("Aucun invader inséré.");
+					    }
+		        },
+		        error: function (xhr, status, error) {
+		            console.log("Erreur AJAX :", error);
+		            // Vous pouvez gérer l'erreur ici (par exemple, afficher un message d'erreur à l'utilisateur)
+		        },
+		        complete: function (xhr, status) {
+		            console.log("Requête AJAX terminée avec statut :", status);
+		            // Code à exécuter une fois la requête AJAX terminée (qu'elle ait réussi ou échoué)
+		        }
+		    });
+		}
 
-			});
-   		}
 
 
 		/*Envoyer les listes vers le serveur*/
-		function ajout_flash_depuis_liste(){
+		function ajout_flash_depuis_liste(){ 
 			$("#loading").show();
 			 /*recup et netoyage de l input :*/
 			 console.log(document.getElementById('malisteaajouter').innerHTML);
@@ -309,15 +325,55 @@ connect();
 			 txt_liste_inv = txt_liste_inv.replaceAll("<div>", ",");
 			 txt_liste_inv = txt_liste_inv.replaceAll("</div>", "");
 			 txt_liste_inv = txt_liste_inv.replaceAll("<br>", "");
+			 txt_liste_inv = txt_liste_inv.replaceAll(";", ",");
+			 txt_liste_inv = txt_liste_inv.replaceAll("/", ",");
+			 txt_liste_inv = txt_liste_inv.replaceAll("\t", ",");
+			 txt_liste_inv = txt_liste_inv.replaceAll("-", ",");
 			 txt_liste_inv = txt_liste_inv.replaceAll(",,", ",");
+			 txt_liste_inv = txt_liste_inv.replaceAll("_0", "_");
+			 txt_liste_inv = txt_liste_inv.replaceAll("_0", "_");
+			 txt_liste_inv = txt_liste_inv.replaceAll("_0", "_");
 			 console.log(txt_liste_inv);
 
 			 //envoie d'une page entiere d'elements vers la base, qui se debrouille ensuite pour couper et crer la table
 			 click_to_flash_multi(txt_liste_inv);
-
-			 /*refresh de la page pour voir les resultats*/
-			 location.reload();
 		}
+
+
+    function delete_position_invader_base(inv_name) {
+    var dataString = 'inv_name=' + inv_name
+        $.ajax({
+            type: "GET",
+            url: "maj_click/delete_position.php",
+            data: dataString,
+            cache: false,
+            success: function (reponse) {
+                //on relance la page entière
+               location.reload();
+           },
+           error: function (reponse){
+            console.log(reponse);
+           }
+        });
+    }
+
+	function get_data(callback) {
+	    $.ajax({
+	        type: "GET",
+	        url: "maj_click/data_export.php",
+	        cache: false,
+	        success: function (reponse) {
+	            callback(reponse); // Appeler la fonction de rappel avec la réponse en tant qu'argument
+	        },
+	        error: function (reponse) {
+	            console.log(reponse);
+	        }
+	    });
+	}
+
+
+
+
 
 	</script>
 </head>
@@ -328,7 +384,7 @@ connect();
 
 
 <!-- Section graph -->
-<section id="main" class="container cartos-section">
+<section id="dd" class="container">
 
     <div class="alert alert-warning alert-dismissible fade in" role="alert">En cours de fabrication
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -358,16 +414,22 @@ connect();
                     <div class="ct-chart ct-major-tenth" id="pie_chart_total"></div>
         			<?php include_once("./graphs/graph_total.php"); ?>
 
+        			<div class="ct-chart ct-major-tenth" id="chart_histo"></div>
+        			<?php include_once("./graphs/graph_historique.php"); ?>
+
         			<br>
 
-
                         <div class="outer-scontainer">
+        				<div class="row">
                     		<h3>Mes flashs</h3>
-
+                    			<!-- <button id="myBtnexport" class="btn btn-primary btn-lg" style="float:right;padding:5px 15px 5px;margin-right:15px">Exporter mes données</button> -->
+                    	</div>
 							<div id='tableflash'></div>
 		        			<?php include_once("./graphs/tableau_flash.php"); ?>
 		        			<br>
                             <div class="row">
+                            	
+
 								<button id="myBtn" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="float:right;">Ajouter une liste de flashs</button>
 
 
@@ -407,6 +469,14 @@ connect();
 							<div id='tableetatuser'></div>
 		        			<?php include_once("./graphs/tableau_etat_user.php"); ?>
                         </div>
+                    <br>
+
+                        <div class="outer-scontainer">
+                    		<h3>Mes contributions</h3>
+							<div id='tablepositionuser'></div>
+		        			<?php include_once("./graphs/tableau_mes_ajouts.php"); ?>
+		        			
+                        </div>
 
 
 
@@ -432,7 +502,8 @@ connect();
 <div class="footer-widget">
 
 <h3 class="mb-4">A propos</h3>
-<p>Invaders mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
+<p>Invader mapper est un moyen simple de localiser et gerer les invaders pour l'application flashInvaders </p>
+<br>
 <p><a href="https://play.google.com/store/apps/details?id=com.ltu.flashInvader&hl=fr" class="btn btn-outline-orange">Télécharger l'application</a></p>
 
 </div>
@@ -443,9 +514,23 @@ connect();
 <div class="footer-widget">
 <h3 class="mb-4">Suivre le projet </h3>
 
-<p><a href="https://github.com/dbwa/inv_mapper"><span class="fa fa-github"></span><small> inv_mapper</small></a></p>
+<p><a href="https://github.com/dbwa/inv_mapper"><span class="fa fa-github"></span> inv_mapper</a></p>
+<br>
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#eb750e', 'I3I6KLTIW');kofiwidget2.draw();</script> 
 
 </div>
+
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('invadermapper', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support me',
+    'floating-chat.donateButton.background-color': '#f45d22',
+    'floating-chat.donateButton.text-color': '#fff'
+  });
+
+</script>
+
 
 </div>
 </div>
@@ -453,7 +538,7 @@ connect();
 <div class="col-md-12 text-center">
 <p>
 
-v0.3.1 <script>document.write(new Date().getFullYear());</script> Invaders Mapper
+v0.3.2 <script>document.write(new Date().getFullYear());</script> Invader Mapper
 
 </p>
 </div>
