@@ -13,37 +13,52 @@ connect();
 $username = $_SESSION['login_name'];
 
 
-
-function data_pie_tot($username)
-{
-    $query = "
-    select 
-		case 
-		when et.etat in ('Détruit !', 'Très dégradé', 'Non visible') then '1-Flashés Détruits'
-		else '2-Flashés OKAY' end as src,
-
-		count(uf.inv_name) as nombre from user_flash uf
-		join etat et on (uf.inv_name = et.inv_name)
-		where user_name = $1 
-		group by 1
-
-	union 
-
-	select 
-		case 
-		when et.etat in ('Détruit !', 'Très dégradé', 'Non visible') then '4-Non flashés Détruits'
-		else '3-Non flashés OKAY' end as src,
-		count(et.inv_name) as nombre from etat et 
-		where inv_name not in (select inv_name from user_flash where user_name = $1)
-		group by 1 order by 1
-    ";
-
-    $params = array($username);
-
-    $res = pg_query_params($query, $params);
-    $data = pg_fetch_all($res);
-    return $data;
+function data_pie_tot($username){
+    $pdo = connect();
+	$query = "
+	        SELECT 
+			    CASE 
+			        WHEN et.etat IN ('Détruit !', 'Très dégradé', 'Non visible') THEN '1-Flashés Détruits'
+			        ELSE '2-Flashés OKAY'
+			    END AS src,
+			    COUNT(uf.inv_name) AS nombre 
+			FROM 
+			    user_flash uf 
+			    JOIN etat et ON uf.inv_name = et.inv_name 
+			WHERE 
+			    uf.user_name = ?
+			GROUP BY 
+			    src
+			UNION 
+			SELECT 
+			    CASE 
+			        WHEN et.etat IN ('Détruit !', 'Très dégradé', 'Non visible') THEN '4-Non flashés Détruits'
+			        ELSE '3-Non flashés OKAY'
+			    END AS src,
+			    COUNT(et.inv_name) AS nombre 
+			FROM 
+			    etat et 
+			WHERE 
+			    et.inv_name NOT IN (
+			        SELECT 
+			            inv_name 
+			        FROM 
+			            user_flash 
+			        WHERE 
+			            user_name = ?
+			    )
+			GROUP BY 
+			    src 
+			ORDER BY 
+			    src;";
+	    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$username, $username]);
+    $result = $stmt->fetchAll();
+    return $result;
 }
+
+
 
 $datas = data_pie_tot($username);
 
@@ -52,7 +67,9 @@ if ($datas != null){
     $data = "";
     $labels = "";
     foreach ($datas as $d) {
-        $labels .= "'" . addslashes(  substr($d['src'], 2)) . "',";
+        $labels .= "'" . addslashes(  
+        		substr($d['src'], 2)
+        	) . "',";
         $data .= addslashes($d['nombre']) . ",";
 
     }
