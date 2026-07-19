@@ -16,22 +16,25 @@ $username = $_SESSION['login_name'];
 
 function data_flashs($username)
 {
+    $pdo = connect();
 	$query = "
-	        select et.inv_name as inv_name,
-	        et.points as points,
-	        et.etat as etat,
-	        --et.last_maj,
-	        et.image1  --,
-	        --et.image2,
-	        --et.image3
-	        from etat et
-	        where et.inv_name in (select uf.inv_name from user_flash as uf where uf.status = 'flash' and uf.user_name=$1) order by et.idx;";
+	        SELECT 
+                uf.inv_name AS inv_name,
+                etat.points AS points,
+                etat.etat AS etat,
+                etat.image1 AS image,
+                uf.date_flash as dateflash
+            FROM user_flash uf 
+            JOIN etat ON uf.inv_name = etat.inv_name
+            WHERE uf.user_name = ?
+            ORDER BY 5 DESC, 1;";
 	    
-	$params = array($username);
-	$res = pg_query_params($query, $params);
-	$data = pg_fetch_all($res);
-    return $data;
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$username]);
+    $result = $stmt->fetchAll();
+    return $result;
 }
+
 
 $datas = data_flashs($username);
 
@@ -42,8 +45,10 @@ $html = "<div style='overflow: auto; max-height: 250px'>
     <thead>
         <tr>
             <th>inv name</th>
+            <th>image</th>
             <th>points</th>
             <th>etat</th>
+            <th>date</th>
             <th>action</th>
 
         </tr>
@@ -57,8 +62,10 @@ foreach ($datas as $row) {
    $html .= "    
         <tr>
             <td>" . addslashes($row['inv_name']) . "</td>
+            <td><img src ='/img_invader/". addslashes($row['image'])  ."' height=25px></td>
             <td>" . addslashes($row['points'])   . "</td>
             <td>" . addslashes($row['etat'])     . "</td>
+            <td>" . addslashes($row['dateflash'])     . "</td>
             <td><input id='del_flash_". addslashes($row['inv_name']) ."' class='btn btn-dark' value='Supprimer le flash' onclick=click_to_NON_flash('". addslashes($row['inv_name']) ."') readonly /></td>
         </tr>
         ";

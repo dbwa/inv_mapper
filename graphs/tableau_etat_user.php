@@ -16,24 +16,23 @@ $username = $_SESSION['login_name'];
 
 function data_flashs_for_tab($username)
 {
-	$query = "select 
-            msu.inv_name as inv_name,
-	        msu.etat as etat,
-	        --et.last_maj,
-	        et.etat as etat_officiel  --,
-	        --et.image2,
-	        --et.image3
-	        from modif_state_user msu
-            join etat as et on ( msu.inv_name = et.inv_name)
-	        where msu.user_name = $1
-             order by 1;
-             ";
-	    
-	$params = array($username);
-	$res = pg_query_params($query, $params);
-	$data = pg_fetch_all($res);
-    return $data;
+    $pdo = connect();
+    $query = "
+            SELECT msu.inv_name AS inv_name,
+                   msu.etat AS etat,
+                   etat.etat AS etat_officiel,
+                   etat.image1 AS image
+            FROM modif_state_user msu
+            JOIN etat ON msu.inv_name = etat.inv_name
+            WHERE msu.user_name = ?
+            ORDER BY 1;";
+        
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$username]);
+    $result = $stmt->fetchAll();
+    return $result;
 }
+
 
 $datas = data_flashs_for_tab($username);
 
@@ -44,6 +43,7 @@ $html = "<div style='overflow: auto; max-height: 250px'>
     <thead>
         <tr>
             <th>inv name</th>
+            <th>image</th>
             <th>etat</th>
             <th>etat officiel</th>
             <th>action</th>
@@ -59,6 +59,7 @@ foreach ($datas as $row) {
    $html .= "    
         <tr>
             <td>" . addslashes($row['inv_name']) . "</td>
+            <td><img src ='/img_invader/". addslashes($row['image'])  ."' height=25px></td>
             <td>" . addslashes($row['etat'])   . "</td>
             <td>" . addslashes($row['etat_officiel'])     . "</td>
             <td>
