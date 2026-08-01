@@ -1,0 +1,172 @@
+<style>
+body {
+    background-color: #181c1f;
+    color: #e0e0e0;
+}
+
+.notice-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #2b2b36;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #e0e0e0;
+    line-height: 1.6;
+}
+
+.notice-container h2 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #3d3d4d;
+}
+
+.notice-container h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.notice-container h4 {
+    color: #c0c0c0;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.notice-container p {
+    margin-bottom: 1rem;
+}
+
+.notice-container a {
+    color: #64B5F6;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.notice-container a:hover {
+    color: #90CAF9;
+    text-decoration: underline;
+}
+
+.notice-container pre {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.notice-container code {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.notice-container kbd {
+    background-color: #3d3d4d;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.notice-container ul {
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+}
+
+.notice-container li {
+    margin-bottom: 0.5rem;
+}
+
+.notice-container em {
+    color: #90CAF9;
+    font-style: italic;
+}
+
+.notice-container strong {
+    color: #fff;
+    font-weight: 600;
+}
+</style>
+
+<div class="notice-container">
+
+
+<h2>Comment récupérer l’UID pour la synchronisation</h2>
+
+<h3>Qu’est-ce que l’UID&nbsp;?</h3>
+<p>
+  L’UID (<em>User IDentifier</em>) est votre identifiant utilisateur au sein de l’application FlashInvader. Il s’agit d’un code unique, généré aléatoirement lors de l’installation de l’application, qui permet de vous identifier lors de chaque connexion entre votre application et les serveurs du jeu. Cet UID est utilisé pour accéder à vos informations personnelles (liste de flashs, liste d’amis, etc.).
+</p>
+
+<h3>Étapes pour récupérer l’UID sur Android (Je ne sais pas le faire sur IOS)</h3>
+
+<h4>1. Installer ADB sur votre ordinateur</h4>
+<p>
+  ADB (<em>Android Debug Bridge</em>) est un outil fourni avec le SDK Android.<br>
+  Téléchargez et installez le SDK ou Android Studio depuis
+  <a href="https://developer.android.com/studio?hl=fr" target="_blank" rel="noopener">cette page</a>.
+</p>
+<p>
+  Après l’installation, ouvrez une fenêtre de commande (<code>cmd</code> ou <code>PowerShell</code>) :
+  <ul>
+    <li>Sur Windows, appuyez sur <kbd>Win</kbd> + <kbd>R</kbd>, tapez <code>cmd</code> ou <code>powershell</code>, puis validez.</li>
+    <li>Tapez <code>adb</code> et appuyez sur Entrée.<br>
+      Si l’aide d’ADB s’affiche, c’est que tout fonctionne.
+    </li>
+  </ul>
+</p>
+
+<h4>2. Activer les options développeur sur le téléphone</h4>
+<p>
+  Pour activer les options développeur, suivez
+  <a href="https://developer.android.com/studio/debug/dev-options?hl=fr" target="_blank" rel="noopener">ce guide officiel</a>.
+</p>
+
+<h4>3. Connecter le téléphone à l’ordinateur</h4>
+<p>
+  Branchez votre téléphone en USB.<br>
+  Dans les options développeur, activez le <strong>débogage USB</strong>.
+</p>
+
+<h4>4. Vérifier la connexion</h4>
+<p>
+  Dans la fenêtre de commande, tapez :
+</p>
+<pre><code>adb devices</code></pre>
+<p>
+  Vous devriez voir une ligne ressemblant à ceci :
+</p>
+<pre><code>List of devices attached
+22610JEGR16066  device
+</code></pre>
+<p>
+  Si votre appareil n’apparaît pas, vérifiez que le mode de connexion USB est bien réglé sur "aucun transfert de fichier" ou "transfert de fichiers", et que le débogage USB est activé.
+</p>
+
+<h4>5. Récupérer l’UID</h4>
+<p>
+  Dans la même fenêtre de commande, lancez :
+</p>
+<pre><code>adb logcat | findstr "api.space-invaders.*uid=[^&amp;]*$"</code></pre>
+<p>
+  Sur votre téléphone, ouvrez l’application FlashInvader et naviguez dans les onglets (classements, galerie, etc.).<br>
+  Vous devriez voir apparaître des lignes comme :
+</p>
+<pre><code>05-04 17:23:29.857 21959 21959 D Help    : load url: https://api.space-invaders.com/flashinvaders_v3_pas_trop_predictif/app_web/account/highscore?uid=2a621490-8cd3-46cc-b12f-7e4009b
+</code></pre>
+<p>
+  Votre UID est la partie après <code>uid=</code>, par exemple :<br>
+  <strong>2a621490-8cd3-46cc-b12f-7e4009b</strong>
+</p>
+<p>
+  Copiez cet UID et enregistrez-le dans l’interface invader-mapper.
+</p>
+
+</div>
