@@ -1,0 +1,21 @@
+
+# DO NOT REMOVE THIS LINE AND THE LINES BELOW HOTLINKID:QdVV5QLvdl
+RewriteEngine on
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?invader-mapper.space/.*$      [NC]
+RewriteRule .*\.(.*|jpg|jpeg|gif|png|bmp|tiff|avi|mpeg|mpg|wma|mov|zip|rar|exe|mp3|pdf|swf|psd|txt|html|htm|php)$ http://google.com [R,NC]
+# DO NOT REMOVE THIS LINE AND THE LINES ABOVE QdVV5QLvdl:HOTLINKID
+
+
+
+
+
+
+
+
+
+
+# DO NOT REMOVE THIS LINE AND THE LINES BELOW ERRORPAGEID:VGViBazcVL
+ErrorDocument 404 /404.html
+# DO NOT REMOVE THIS LINE AND THE LINES ABOVE VGViBazcVL:ERRORPAGEID
+
