@@ -31,3 +31,6 @@ __pycache__/
 
 # Identifiants locaux (voir config.local.php.example)
 config.local.php
+
+# Dump complet de la base : contient des donnees personnelles
+sql/donnees-locales.sql
