@@ -6,10 +6,10 @@ error_reporting(E_ALL);
 // Démarrage du buffer de sortie
 ob_start();
 
+session_start();
 include_once(__DIR__ . '/../../fonctions.inc.php');
 include_once(__DIR__ . '/../../config.php');
 $pdo = connect();
-session_start();
 
 // Nettoyage du buffer avant d'envoyer les headers
 ob_clean();
@@ -129,8 +129,8 @@ imagedestroy($source_image);
     // Réponse de succès
     $response = [
         'success' => true,
-        'message' => utf8_encode('Photo enregistrée avec succès'),
-        'filename' => utf8_encode($filename)
+        'message' => 'Photo enregistrÃ©e avec succÃ¨s',
+        'filename' => $filename
     ];
     
 } catch (Exception $e) {

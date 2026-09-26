@@ -1,6 +1,11 @@
 
 # DO NOT REMOVE THIS LINE AND THE LINES BELOW HOTLINKID:QdVV5QLvdl
 RewriteEngine on
+# En local (localhost / 127.0.0.1), la protection anti-hotlink est desactivee :
+# le referent ne correspond jamais au domaine de production, ce qui redirigeait
+# toutes les requetes .php/.html vers google.com.
+RewriteCond %{HTTP_HOST} !^localhost(:[0-9]+)?$          [NC]
+RewriteCond %{HTTP_HOST} !^127\.0\.0\.1(:[0-9]+)?$        [NC]
 RewriteCond %{HTTP_REFERER} !^$
 RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?invader-mapper.space/.*$      [NC]
 RewriteRule .*\.(.*|jpg|jpeg|gif|png|bmp|tiff|avi|mpeg|mpg|wma|mov|zip|rar|exe|mp3|pdf|swf|psd|txt|html|htm|php)$ http://google.com [R,NC]

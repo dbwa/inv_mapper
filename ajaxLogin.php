@@ -4,9 +4,13 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// session_start() doit etre appele AVANT tout include produisant de la sortie :
+// fonctions.inc.php se termine par une balise de fermeture suivie d'un saut
+// de ligne, ce qui envoie un octet et faisait echouer la session.
+session_start();
+
 include_once(__DIR__ . "/fonctions.inc.php");
 connect();
-session_start();
 
 // Log des données reçues
 error_log("Méthode HTTP: " . $_SERVER['REQUEST_METHOD']);

@@ -1,7 +1,10 @@
 <?php
+// session_start() avant tout include : fonctions.inc.php se termine par une
+// balise de fermeture suivie d'un saut de ligne, ce qui envoie un octet et
+// casse la session.
+session_start();
 include_once(__DIR__ . '/config.php');
 include_once("fonctions.inc.php");
-session_start();
 
 // Vérifier d'abord le cookie de connexion
 restore_session_from_cookie();
@@ -202,7 +205,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h3>Invader mapper</h3>
 
         <?php
-                if ($_GET['register'] == "success"){ //pour tout le monde                    
+                if (isset($_GET['register']) && $_GET['register'] == "success"){ //pour tout le monde                    
                    echo '
             <div class="alert alert-success" role="alert">Compte créé. Veuillez vous connecter.
             </div>

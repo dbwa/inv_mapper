@@ -1,6 +1,8 @@
-FROM php:7.4-apache
+FROM php:8.4-apache
 
 # Extensions systeme necessaires a la compilation des extensions PHP
+# libonig-dev : requis par mbstring. Present dans l'image php:7.4 (Debian 11)
+# mais plus dans php:8.4 (Debian 13), d'ou l'installation explicite.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libjpeg62-turbo-dev \
@@ -8,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libzip-dev \
         libcurl4-openssl-dev \
+        libonig-dev \
         locales \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,6 +31,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 
 # mod_rewrite pour les .htaccess (tile_proxy, cache de tuiles)
 RUN a2enmod rewrite
+
+# mod_headers pour les en-tetes CORS de l'API
+RUN a2enmod headers
 
 # Configuration PHP alignee sur la production
 COPY php.ini /usr/local/etc/php/conf.d/zz-invader-mapper.ini

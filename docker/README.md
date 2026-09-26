@@ -3,6 +3,11 @@
 Ce dossier permet de faire tourner le site en local avec Docker, sans jamais
 toucher a la production.
 
+## Version de PHP
+
+L'environnement Docker tourne sous PHP 8.4 (Apache) et MariaDB 11.8, aligne sur
+la cible de migration. La production est encore en PHP 7.4.33.
+
 ## Prerequis
 
 Docker et Docker Compose.
@@ -27,8 +32,10 @@ Au premier demarrage, MariaDB execute les fichiers de `sql/init/` dans l'ordre :
 | `01-schema.sql` | Structure des tables et des vues |
 | `02-donnees-reference.sql` | Villes et badges |
 | `03-donnees-jeu.sql` | Positions des invaders et leur etat |
+| `04-fonctions.sql` | Fonctions stockees (badges, distances, flashs) |
+| `05-tables-extra.sql` | Tables supplementaires de production (api_players, invit_users, last_maj_invaders, user_info) |
 
-Ces trois fichiers ne contiennent **aucune donnee personnelle** et sont
+Ces cinq fichiers ne contiennent **aucune donnee personnelle** et sont
 versionnes.
 
 ## Charger les donnees reelles (optionnel)
@@ -37,13 +44,20 @@ Pour travailler avec les vraies donnees de production, un dump complet est
 disponible dans `sql/donnees-locales.sql`. Il est **exclu du depot git** car il
 contient des donnees personnelles (comptes, jetons de session, cles API).
 
-Pour l'utiliser, il faut repartir d'une base vide :
+Le dump brut n'est pas directement chargeable : les vues `liste_etats` et
+`ville_centroides` y sont tronquees, les INSERT de `user_badges` et
+`user_photos` arrivent avant la table `users` (cle etrangere), et des clauses
+de definisseur referencent l'utilisateur de production. Le script
+`scripts/import-donnees-reelles.sh` corrige tout cela automatiquement.
 
 ```bash
-docker compose down -v
-docker compose up -d --build
-docker compose exec -T db mariadb -u root -proot invaders < sql/donnees-locales.sql
+./scripts/import-donnees-reelles.sh
 ```
+
+Le script nettoie le dump (definisseurs, vues tronquees, ordre des INSERT),
+charge le resultat dans la base Docker, puis affiche un resume (utilisateurs,
+positions, flashs, photos, badges). Il est **rejouable a volonte** : chaque
+lancement repart d'une base propre.
 
 ## Identifiants de la base locale
 

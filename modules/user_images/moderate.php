@@ -2,9 +2,9 @@
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
+session_start();
 include_once(__DIR__ . '/../../fonctions.inc.php');
 include_once(__DIR__ . '/../../config.php');
-session_start();
 
 // Vérification des droits
 if (

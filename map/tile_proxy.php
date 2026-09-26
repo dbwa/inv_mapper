@@ -81,7 +81,6 @@ curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) A
 $tileData = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
-curl_close($ch);
 
 // Vérifier si le téléchargement a réussi (code HTTP 200)
 if ($tileData === false || $httpCode !== 200) {

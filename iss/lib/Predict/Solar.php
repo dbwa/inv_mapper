@@ -81,7 +81,7 @@ class Predict_Solar
      *
      * @return Predict_ObsSet
      */
-    public static function FindSun(Predict_QTH $qth, $daynum = null)
+    public static function FindSun(?Predict_QTH $qth, $daynum = null)
     {
         if ($daynum === null) {
             $daynum = Predict_Time::get_current_daynum();

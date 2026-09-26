@@ -1,5 +1,5 @@
 <?php
-setlocale(LC_TIME, "fr_FR");
+setlocale(LC_TIME, "fr_FR.UTF-8", "fr_FR", "fr");
 
 $pdo = null; // Variable globale pour la connexion PDO
 
@@ -30,7 +30,7 @@ function authentificate($username, $password, $remember = false) {
     if ($result) {
         // si okay, enregistrer la connexion 
         // Récupérer les informations sur le type d'appareil (mobile ou desktop)
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
         $deviceType = (strpos($userAgent, 'Mobile') !== false) ? 'Mobile' : 'Desktop';
         $browser = getBrowserName($userAgent);
         
@@ -150,7 +150,7 @@ function register_user($login, $user_password, $invitcode)
 
 // Fonction pour générer un identifiant unique pour l'appareil
 function generate_device_id() {
-    $userAgent = $_SERVER['HTTP_USER_AGENT'];
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $deviceType = (strpos($userAgent, 'Mobile') !== false) ? 'Mobile' : 'Desktop';
     $browser = getBrowserName($userAgent);
     
@@ -577,12 +577,12 @@ function update_status($inv_name, $out_status){
     //pour changer le l'etat de l'invaders de ok a detruit par exemple, mais user par user
     $query = "DELETE FROM modif_state_user WHERE inv_name=? AND user_name=?";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$inv_name, $_SESSION['login_name']]);
+    $stmt->execute([$inv_name, $_SESSION['login_name'] ?? '']);
 
     $out_status = str_replace(':s:', ' ', $out_status);
     $query = "INSERT INTO modif_state_user(user_name, inv_name, etat, date_modif) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$_SESSION['login_name'], $inv_name, $out_status]);
+    $stmt->execute([$_SESSION['login_name'] ?? '', $inv_name, $out_status]);
 
     return 1;
 }
@@ -592,7 +592,7 @@ function suppri_flash($inv_name) {
     // supr du flash dans la base user pour un invader donnée
     $query = "DELETE FROM user_flash WHERE user_name=? AND inv_name=?";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$_SESSION['login_name'], $inv_name]);
+    $stmt->execute([$_SESSION['login_name'] ?? '', $inv_name]);
 }
 
 function ajout_flash($inv_name) {
@@ -608,7 +608,7 @@ function ajout_flash($inv_name) {
         WHERE NOT EXISTS (SELECT inv_name FROM user_flash WHERE user_name = ? AND inv_name = ?)
         AND EXISTS (SELECT inv_name FROM etat WHERE inv_name = ?)";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$_SESSION['login_name'], $inv_name, $_SESSION['login_name'], $inv_name, $inv_name]);
+    $stmt->execute([$_SESSION['login_name'] ?? '', $inv_name, $_SESSION['login_name'] ?? '', $inv_name, $inv_name]);
     return 1;
 }
 
@@ -645,7 +645,7 @@ function ajout_flash_multi($list_inv_name) {
     $stmt = $pdo->prepare($query);
 
     // Nom d'utilisateur à insérer
-    $user_name = $_SESSION['login_name'];
+    $user_name = $_SESSION['login_name'] ?? '';
 
     // Compteur pour le nombre d'invaders insérés
     $insertedCount = 0;
@@ -677,14 +677,14 @@ function update_categorisations_utilisateur($txt_categories){
     $query = "delete from user_config where user_name=?";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$_SESSION['login_name']]);
+    $stmt->execute([$_SESSION['login_name'] ?? '']);
     $data = $stmt->fetch();
 
     if($txt_categories <=> 'default')
     {   
         $query = "insert into user_config select ? as user_name, ? as categories_map";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$_SESSION['login_name'], $txt_categories]);
+        $stmt->execute([$_SESSION['login_name'] ?? '', $txt_categories]);
         $data = $stmt->fetch();
     }
     return 1;
@@ -864,7 +864,7 @@ function ajout_position($inv_name, $lat, $lon){
         select replace(?, '_0', '_') as inv_name, CAST(? as float) as lat , CAST(? as float) as lon, null as points, login as photo, ? as alti 
         from users where login = ? and game_name is not null;";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$inv_name, $lat, $lon, $alti, $_SESSION['login_name']]);
+    $stmt->execute([$inv_name, $lat, $lon, $alti, $_SESSION['login_name'] ?? '']);
     return 1;
 }
 
@@ -876,7 +876,7 @@ function delete_position($inv_name){
     $query = "update positions set inv_name = concat('DELETED - ', inv_name, ' - ', NOW()),
     photo = concat('DELETED_', photo) where inv_name = ? and photo = ?;";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$inv_name, $_SESSION['login_name']]);
+    $stmt->execute([$inv_name, $_SESSION['login_name'] ?? '']);
     return 1;
 }
 
@@ -896,7 +896,7 @@ function get_achievements(){
         ";
         
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$_SESSION['login_name']]);
+        $stmt->execute([$_SESSION['login_name'] ?? '']);
         
         // Récupère tous les résultats dans un tableau associatif
         $achievements = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,4 +1,6 @@
 <?php
+// ATTENTION : fichier non utilise par le site (code mort). Conserve pour reference.
+// Il utilise mysqli_connect_errno() sans connexion mysqli et ne fonctionne pas en PHP 8.
 /**
  * Copyright (C) 2019 Phppot
  *

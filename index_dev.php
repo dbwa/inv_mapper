@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
 <?php
+// Le bloc PHP doit rester AVANT toute sortie HTML : sinon session_start()
+// echoue avec "headers already sent" (visible depuis PHP 8).
 session_start();
 include_once(__DIR__ . '/config.php');
 
@@ -9,6 +9,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 ?>
+<!DOCTYPE html>
+<html lang="fr">
 
 <head>
     <meta name="robots" content="noindex">

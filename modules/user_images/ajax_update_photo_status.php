@@ -2,9 +2,9 @@
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
+session_start();
 include_once(__DIR__ . '/../../fonctions.inc.php');
 include_once(__DIR__ . '/../../config.php');
-session_start();
 
 header('Content-Type: application/json');
 
@@ -33,7 +33,7 @@ try {
     if (update_photo_status($photo_id, $status, $_SESSION['login_user'])) {
         $response = [
             'success' => true,
-            'message' => utf8_encode('Status mis à jour avec succès')
+            'message' => 'Status mis à jour avec succès'
         ];
     } else {
         throw new Exception('Erreur lors de la mise à jour');

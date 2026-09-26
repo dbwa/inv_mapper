@@ -136,7 +136,7 @@ class Predict
      * @return Predict_Pass Pointer instance or NULL if no pass can be
      *         found.
      */
-    public function get_next_pass(Predict_Sat $sat, Predict_QTH $qth, $maxdt)
+    public function get_next_pass(Predict_Sat $sat, ?Predict_QTH $qth, $maxdt)
     {
         /* get the current time and call the get_pass function */
         $now = Predict_Time::get_current_daynum();
@@ -161,7 +161,7 @@ class Predict
      *  note the data in sat will be corrupt (future) and must be refreshed
      *       by the caller, if the caller will need it later on
      */
-    public function get_pass(Predict_Sat $sat_in, Predict_QTH $qth, $start, $maxdt)
+    public function get_pass(Predict_Sat $sat_in, ?Predict_QTH $qth, $start, $maxdt)
     {
         $aos = 0.0;    /* time of AOS */
         $tca = 0.0;    /* time of TCA */
@@ -350,7 +350,7 @@ class Predict
      *
      * @return int The visiblity constant, 0, 1, 2, or 3 (see above)
      */
-    public function get_sat_vis(Predict_Sat $sat, Predict_QTH $qth, $jul_utc)
+    public function get_sat_vis(Predict_Sat $sat, ?Predict_QTH $qth, $jul_utc)
     {
         /* gboolean sat_sun_status;
         gdouble  sun_el;
@@ -416,7 +416,7 @@ class Predict
      * the new start time.
      *
      */
-    public function find_aos(Predict_Sat $sat, Predict_QTH $qth, $start, $maxdt)
+    public function find_aos(Predict_Sat $sat, ?Predict_QTH $qth, $start, $maxdt)
     {
         $t = $start;
         $aostime = 0.0;
@@ -498,7 +498,7 @@ class Predict
      *  @param float       $t   The time for calculation (Julian Date)
      *
      */
-    public function predict_calc(Predict_Sat $sat, Predict_QTH $qth, $t)
+    public function predict_calc(Predict_Sat $sat, ?Predict_QTH $qth, $t)
     {
         $obs_set      = new Predict_ObsSet();
         $sat_geodetic = new Predict_Geodetic();
@@ -574,7 +574,7 @@ class Predict
      * lengthy loops.
      *
      */
-    public function find_los(Predict_Sat $sat, Predict_QTH $qth, $start, $maxdt)
+    public function find_los(Predict_Sat $sat, ?Predict_QTH $qth, $start, $maxdt)
     {
         $t = $start;
         $lostime = 0.0;
@@ -653,7 +653,7 @@ class Predict
      * This function can be used to find the AOS time in the past of the
      * current pass.
      */
-    public function find_prev_aos(Predict_Sat $sat, Predict_QTH $qth, $start)
+    public function find_prev_aos(Predict_Sat $sat, ?Predict_QTH $qth, $start)
     {
         $aostime = $start;
 
@@ -686,7 +686,7 @@ class Predict
      *  @return bool true if the satellite will reach AOS, false otherwise.
      *
      */
-    public function has_aos(Predict_Sat $sat, Predict_QTH $qth)
+    public function has_aos(Predict_Sat $sat, ?Predict_QTH $qth)
     {
          $retcode = false;
 
@@ -741,7 +741,7 @@ class Predict
      * @param int   $num   The max # of passes to get
      * @return array of Predict_Pass instances if found, empty array otherwise
      */
-    public function get_passes(Predict_Sat $sat, Predict_QTH $qth, $start, $maxdt, $num = 0)
+    public function get_passes(Predict_Sat $sat, ?Predict_QTH $qth, $start, $maxdt, $num = 0)
     {
         $passes = array();
 

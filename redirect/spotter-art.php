@@ -11,7 +11,6 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
 curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 curl_exec($ch);
-curl_close($ch);
 
 // 3. Préparer les données POST avec le nom dynamique
 $postData = $ville . '=&numero=' . $numero . '&mode=si';
@@ -23,9 +22,9 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
 curl_setopt($ch, CURLOPT_REFERER, 'https://www.invader-spotter.art/news.php');
-curl_setopt($ch, CURLOPT_ORIGIN, 'https://www.invader-spotter.art');
 curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Origin: https://www.invader-spotter.art',
     'Content-Type: application/x-www-form-urlencoded',
     'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Language: en-US,en;q=0.7',
@@ -39,7 +38,6 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 ]);
 
 $response = curl_exec($ch);
-curl_close($ch);
 
 // 5. Nettoyer le fichier de cookies
 unlink($cookieFile);

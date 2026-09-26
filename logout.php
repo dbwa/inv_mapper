@@ -1,6 +1,9 @@
 <?php
-include_once(__DIR__ . "/fonctions.inc.php");
+// session_start() avant tout include : fonctions.inc.php se termine par une
+// balise de fermeture suivie d'un saut de ligne, ce qui envoie un octet et
+// casse la session.
 session_start();
+include_once(__DIR__ . "/fonctions.inc.php");
 
 if (!empty($_SESSION['login_user'])) {
     $username = $_SESSION['login_user'];
