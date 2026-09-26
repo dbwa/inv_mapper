@@ -20,9 +20,6 @@ cache/
 iss/cache/
 map/cache/
 
-# Bibliotheques tierces
-iss/lib/
-
 # Fichiers systeme et temporaires
 Thumbs.db
 __pycache__/
