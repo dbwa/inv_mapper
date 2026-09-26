@@ -12,6 +12,12 @@ $user = "utilisateur";
 //$password = Mot de passe de l'utilisateur servant à la connexion à la base de données
 $password = "mot_de_passe";
 
+// Les identifiants réels se renseignent dans config.local.php (non versionné).
+// Copier config.local.php.example en config.local.php et le remplir.
+if (file_exists(__DIR__ . '/config.local.php')) {
+    include(__DIR__ . '/config.local.php');
+}
+
 $center_lat = 48.67895;
 $center_lon = 2.5019;
 

@@ -1,0 +1,34 @@
+<?php
+
+// ---------------------------------------------------------------------------
+// Configuration locale - A REMPLIR ET A RENOMMER EN config.local.php
+// ---------------------------------------------------------------------------
+//
+// Ce fichier n'est PAS versionne (voir .gitignore).
+// Copiez-le en config.local.php et renseignez vos propres identifiants :
+//
+//     cp config.local.php.example config.local.php
+//
+// config.local.php est charge automatiquement par config.php et ecrase les
+// valeurs par defaut. Ne commitez jamais config.local.php.
+// ---------------------------------------------------------------------------
+
+// $host = Nom d'hote ou adresse IP du serveur de la base de donnees.
+//         Mettre "localhost" si la base est sur le meme serveur que le site.
+$host = "localhost";
+
+// $port = Numero du port de connexion a la base de donnees.
+$port = 3306;
+
+// $dbname = Nom de la base de donnees.
+$dbname = "nom_de_la_base";
+
+// $user = Nom de l'utilisateur servant a la connexion a la base de donnees.
+$user = "utilisateur";
+
+// $password = Mot de passe de cet utilisateur.
+$password = "mot_de_passe";
+
+// $code_inscription = Code d'invitation demande a l'inscription.
+//                     Laisser vide ('') pour autoriser les inscriptions libres.
+$code_inscription = '';

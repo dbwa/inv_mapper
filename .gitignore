@@ -31,3 +31,6 @@ __pycache__/
 
 # Configuration serveur
 .well-known/
+
+# Identifiants locaux (voir config.local.php.example)
+config.local.php
