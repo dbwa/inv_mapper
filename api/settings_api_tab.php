@@ -27,7 +27,11 @@ $api_message = null;
 $api_message_type = 'ok';
 $api_new_key = null;
 
-if (isset($_POST['api_action'])) {
+// Action modifiant des donnees : jeton CSRF obligatoire.
+if (isset($_POST['api_action']) && !csrf_validate()) {
+    $api_message = 'Session expiree ou requete invalide. Rechargez la page et reessayez.';
+    $api_message_type = 'error';
+} elseif (isset($_POST['api_action'])) {
 
     if ($_POST['api_action'] === 'generate') {
 
@@ -202,6 +206,7 @@ $api_base = $scheme . '://' . $host . '/api/v1';
                     <form method="post" action="#settings-api" style="margin:0;"
                           onsubmit="return confirm('Revoquer cette cle ? Les outils qui l\'utilisent cesseront de fonctionner.');">
                         <input type="hidden" name="api_action" value="revoke">
+                        <?php echo csrf_field(); ?>
                         <input type="hidden" name="api_key_id" value="<?php echo (int) $key['id']; ?>">
                         <button class="btn-small waves-effect waves-light red darken-2" type="submit">
                             Revoquer
@@ -216,6 +221,7 @@ $api_base = $scheme . '://' . $host . '/api/v1';
 
 <form method="post" action="#settings-api" style="margin-top:20px;">
     <input type="hidden" name="api_action" value="generate">
+    <?php echo csrf_field(); ?>
     <div class="row" style="margin-bottom:0;">
         <div class="input-field col s12 m6">
             <input id="api_label" name="api_label" type="text" maxlength="100">

@@ -46,6 +46,7 @@ $prefill_invi = isset($_GET['invi']) ? $_GET['invi'] : '';
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <?php include_once(__DIR__ . '/csrf.php'); ?>
     <!-- pour hash le password -->
     <script src="js/CryptoJS.js"></script>
 
@@ -114,15 +115,15 @@ $prefill_invi = isset($_GET['invi']) ? $_GET['invi'] : '';
                 } else
                  {   
                     var hashpassword = CryptoJS.SHA1(password).toString();
-                    var dataString = 'username='+ username +'&pass='+ invit_code + '&password='+ hashpassword;
+                    var data = {username: username, pass: invit_code, password: hashpassword};
 
                     if ($.trim(username).length > 0 && $.trim(password).length > 0) {
 
 
                         $.ajax({
-                            type: "GET",
+                            type: "POST",
                             url: "AjaxRegister.php",
-                            data: dataString,
+                            data: data,
                             cache: false,
                             beforeSend: function () {
                                 $("#login").val('Enregistrement...');

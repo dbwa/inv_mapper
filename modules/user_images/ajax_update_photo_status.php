@@ -9,6 +9,9 @@ include_once(__DIR__ . '/../../config.php');
 header('Content-Type: application/json');
 
 try {
+    // Action modifiant des donnees : jeton CSRF obligatoire.
+    csrf_check();
+
     // Vérification des droits de modération
     if (
         !isset($_SESSION['login_user']) ||

@@ -6,9 +6,15 @@ include_once(__DIR__ . '/../config.php');
 connect();
 session_start();
 
+// Action modifiant des donnees : jeton CSRF obligatoire.
+csrf_check();
+
+// Action reservee aux utilisateurs connectes.
+require_login();
+
 // Recuperation des variables POST
-$inv_name = $_GET['inv_name'];
-$statusout = $_GET['statusout'];
+$inv_name = $_POST['inv_name'];
+$statusout = $_POST['statusout'];
 
 #update du status de l'invader
 update_status($inv_name, $statusout);

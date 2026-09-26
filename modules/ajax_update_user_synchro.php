@@ -9,6 +9,8 @@ connect();
 // On récupère les données JSON envoyées
 $data = json_decode(file_get_contents('php://input'), true);
 
+// Action modifiant des donnees : jeton CSRF obligatoire.
+csrf_check($data['csrf_token'] ?? '');
 if (isset($data['uid_flashinvader']) && isset($data['game_name']) && isset($_SESSION['login_user'])) {
     list($success, $message) = update_user_synchro($_SESSION['login_user'], $data['uid_flashinvader'], $data['game_name']);
     

@@ -268,12 +268,15 @@ connect();
             }
 
             // Préparez les données à envoyer au serveur
-            var dataString = 'username=' + encodeURIComponent(<?php echo json_encode((string)$username, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?: '""'; ?>) + '&currentpass='+ currentPassword + '&newpassword='+ newPassword;
-            console.log(dataString);
+            // (pas de login dans la requête : le serveur utilise la session, cf. point 22)
+            var data = {
+                currentpass: currentPassword,
+                newpassword: newPassword
+            };
             $.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: "AjaxUpdatePassword.php",
-                    data: dataString,
+                    data: data,
                     cache: false,
                     beforeSend: function () {
                         /*$("#login").val('Enregistrement...');*/

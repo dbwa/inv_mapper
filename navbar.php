@@ -1,3 +1,4 @@
+<?php include_once(__DIR__ . '/csrf.php'); ?>
 <!-- Navigation -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet">

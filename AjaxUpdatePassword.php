@@ -7,11 +7,25 @@ session_start();
 include_once(__DIR__ . "/fonctions.inc.php");
 connect();
 
-if (isSet($_GET['username']) && isSet($_GET['currentpass']) && isSet($_GET['newpassword'])) {
+// Action modifiant des donnees : jeton CSRF obligatoire.
+csrf_check();
 
-    $username = $_GET['username'];
-    $currentpass = $_GET['currentpass'];
-    $newpassword = $_GET['newpassword'];  //le code donné en ammont
+if (isSet($_POST['currentpass']) && isSet($_POST['newpassword'])) {
+
+    // Le login vient de la session, jamais de la requête (cf. besoin_securite.md
+    // point 22) : on ne peut changer que le mot de passe de sa propre session.
+    if (empty($_SESSION['login_user'])) {
+        $reponse = array(
+            'success' => false,
+            'raison' => 'session expiree',
+            'login' => ''
+        );
+        echo json_encode($reponse);
+        return 1;
+    }
+    $username = $_SESSION['login_user'];
+    $currentpass = $_POST['currentpass'];
+    $newpassword = $_POST['newpassword'];  //le code donné en ammont
 
     $result = update_password($username, $currentpass, $newpassword);
     if ($result == 'password non changé')

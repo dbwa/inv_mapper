@@ -1097,6 +1097,7 @@ async function submitPhoto() {
     formData.append('invader', invaderName);
     formData.append('photo', document.getElementById('photoInput').files[0]);
     formData.append('showCredit', document.getElementById('creditCheck').checked ? 1 : 0);
+    formData.append('csrf_token', CSRF_TOKEN);
 
     // Afficher un toast "en cours"
     M.toast({html: 'Envoi en cours...', classes: 'blue'});
@@ -1144,7 +1145,7 @@ async function submitPhoto() {
     function click_to_detruit(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&statusout=detruit';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -1165,7 +1166,7 @@ async function submitPhoto() {
     function click_to_reactive(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&statusout=OK';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -1187,7 +1188,7 @@ async function submitPhoto() {
     function click_to_flash(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&flash=vrai';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_flash.php",
             data: dataString,
             cache: false,
@@ -1229,7 +1230,7 @@ async function submitPhoto() {
         var dataString = 'inv_name=' + inv_name + '&flash=faux';
         console.log(dataString);
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_flash.php",
             data: dataString,
             cache: false,

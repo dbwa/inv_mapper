@@ -227,7 +227,7 @@ function updateStatus(photoId, status) {
     $.ajax({
         url: '/modules/user_images/ajax_update_photo_status.php',
         method: 'POST',
-        data: { photo_id: photoId, status: status },
+        data: { photo_id: photoId, status: status, csrf_token: CSRF_TOKEN },
         dataType: 'json',
         success: function(response) {
             if (response.success) {

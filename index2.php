@@ -42,6 +42,7 @@ error_reporting(E_ALL);
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <?php include_once(__DIR__ . '/csrf.php'); ?>
 
     <!-- Bootstrap Core JavaScript -->
 <!--     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

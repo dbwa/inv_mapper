@@ -24,7 +24,11 @@ $pdo = connect();
 $compte_message = null;
 $compte_message_type = 'ok';
 
-if (isset($_POST['compte_action'])) {
+// Action modifiant des donnees : jeton CSRF obligatoire.
+if (isset($_POST['compte_action']) && !csrf_validate()) {
+    $compte_message = "Session expirée ou requête invalide. Rechargez la page et réessayez.";
+    $compte_message_type = 'error';
+} elseif (isset($_POST['compte_action'])) {
 
     // --- Demande de suppression de compte ----------------------------------
     if ($_POST['compte_action'] === 'demander_suppression') {
@@ -293,6 +297,7 @@ $delai_purge_jours = 30;
                 <form method="post" action="#settings-compte"
                       onsubmit="return confirm('Confirmer la suppression de votre compte ? Cette action vous déconnectera immédiatement.');">
                     <input type="hidden" name="compte_action" value="demander_suppression">
+                    <?php echo csrf_field(); ?>
                     <div class="row" style="margin-bottom:0;">
                         <div class="input-field col s12 m6">
                             <input id="confirmation" name="confirmation" type="text" autocomplete="off" required>

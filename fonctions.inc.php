@@ -77,6 +77,75 @@ function login_attempt_reset($login)
     }
 }
 
+// --- Protection CSRF (cf. besoin_securite.md point 9) ---
+// Jeton aléatoire stocké en session, injecté dans chaque page et vérifié
+// avant toute action modifiant des données. Un site tiers peut déclencher
+// des requêtes vers le site, mais ne peut pas lire le jeton (Same-Origin
+// Policy), donc ses requêtes forgées sont refusées.
+
+define('CSRF_TOKEN_NAME', 'csrf_token');
+
+function csrf_token()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION[CSRF_TOKEN_NAME]) || !is_string($_SESSION[CSRF_TOKEN_NAME])) {
+        $_SESSION[CSRF_TOKEN_NAME] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION[CSRF_TOKEN_NAME];
+}
+
+function csrf_field()
+{
+    return '<input type="hidden" name="' . CSRF_TOKEN_NAME . '" value="'
+        . htmlspecialchars(csrf_token(), ENT_QUOTES) . '">';
+}
+
+function csrf_validate($token = null)
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if ($token === null) {
+        $token = $_POST[CSRF_TOKEN_NAME] ?? '';
+    }
+    if (!is_string($token) || $token === '') {
+        return false;
+    }
+    return hash_equals(csrf_token(), $token);
+}
+
+// Refuse la requête (403 + JSON) si le jeton est absent ou invalide.
+function csrf_check($token = null)
+{
+    if (!csrf_validate($token)) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Requête refusée (jeton de sécurité invalide). Rechargez la page.'
+        ]);
+        exit;
+    }
+}
+
+// Refuse la requête (401 + JSON) si l'utilisateur n'est pas connecté.
+// Pour les endpoints d'action réservés aux adhérents (maj_click/*, etc.).
+function require_login()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['login_user'])) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Connexion requise pour cette action.'
+        ]);
+        exit;
+    }
+}
+
 // Authentification d'un utilisateur
 function authentificate($username, $password, $remember = false) {
     $pdo = connect();

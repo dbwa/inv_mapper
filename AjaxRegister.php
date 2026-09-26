@@ -7,11 +7,14 @@ session_start();
 include_once(__DIR__ . "/fonctions.inc.php");
 connect();
 
-if (isSet($_GET['username']) && isSet($_GET['password']) && isSet($_GET['pass'])) {
+// Action creant un compte : jeton CSRF obligatoire.
+csrf_check();
 
-    $username = $_GET['username'];
-    $password = $_GET['password'];
-    $pass = $_GET['pass'];  //le code donné en ammont
+if (isSet($_POST['username']) && isSet($_POST['password']) && isSet($_POST['pass'])) {
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $pass = $_POST['pass'];  //le code donné en ammont
 
     if (!preg_match('/^[A-Za-z0-9_][A-Za-z0-9_.-]{1,49}$/', $username)) {
         exit();

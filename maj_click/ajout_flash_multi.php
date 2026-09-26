@@ -6,8 +6,14 @@ include_once(__DIR__ . '/../config.php');
 connect();
 session_start();
 
+// Action modifiant des donnees : jeton CSRF obligatoire.
+csrf_check();
+
+// Action reservee aux utilisateurs connectes.
+require_login();
+
 // Recuperation des variables POST
-$inv_names = $_GET['inv_names'];
+$inv_names = $_POST['inv_names'];
 
 $insertedCount = ajout_flash_multi($inv_names);
 

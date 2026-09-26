@@ -93,7 +93,7 @@ var background_tiles ={ "regular_tile" : regular_tile, "white_tile" : white_tile
     function click_to_detruit(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&statusout=detruit';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -115,7 +115,7 @@ var background_tiles ={ "regular_tile" : regular_tile, "white_tile" : white_tile
     function click_to_reactive(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&statusout=OK';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -137,7 +137,7 @@ var background_tiles ={ "regular_tile" : regular_tile, "white_tile" : white_tile
     function click_to_change_etat(inv_name, etat) {
         var dataString = 'inv_name=' + inv_name + '&statusout='+etat;
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -159,7 +159,7 @@ var background_tiles ={ "regular_tile" : regular_tile, "white_tile" : white_tile
     function click_to_flash(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&flash=vrai';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_flash2.php",
             data: dataString,
             cache: false,
@@ -187,7 +187,7 @@ var background_tiles ={ "regular_tile" : regular_tile, "white_tile" : white_tile
     function click_to_NON_flash(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&flash=faux';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_flash2.php",
             data: dataString,
             cache: false,
@@ -393,7 +393,7 @@ map.addControl( controlSearch );
 	    var dataString = 'inv_name=' + inv_name + '&lat=' + lat + '&lon=' + lon;
 
 	        $.ajax({
-	            type: "GET",
+	            type: "POST",
 	            url: "maj_click/ajout_position.php",
 	            data: dataString,
 	            cache: false,

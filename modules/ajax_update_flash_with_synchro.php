@@ -17,6 +17,9 @@ if (!isset($_SESSION['login_user'])) {
 // Récupération des données JSON
 $data = json_decode(file_get_contents('php://input'), true);
 
+// Action modifiant des donnees : jeton CSRF obligatoire.
+csrf_check($data['csrf_token'] ?? '');
+
 if (!$data || !isset($data['invaders'])) {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Données invalides']);

@@ -21,6 +21,11 @@ try {
         throw new Exception('Utilisateur non connecté');
     }
 
+    // Action modifiant des donnees : jeton CSRF obligatoire.
+    if (!csrf_validate()) {
+        throw new Exception('Requete refusee (jeton de securite invalide). Rechargez la page.');
+    }
+
     // Vérification des données reçues
     if (!isset($_POST['invader']) || !isset($_FILES['photo'])) {
         throw new Exception('Données manquantes');

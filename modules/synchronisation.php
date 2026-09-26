@@ -182,7 +182,8 @@ include_once(__DIR__."/../fonctions.inc.php"); ?>
                         },
                         body: JSON.stringify({
                             uid_flashinvader: uid,
-                            game_name: data.name
+                            game_name: data.name,
+                            csrf_token: CSRF_TOKEN
                         })
                     });
 
@@ -273,7 +274,7 @@ include_once(__DIR__."/../fonctions.inc.php"); ?>
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(window.flashData)
+                    body: JSON.stringify({ ...window.flashData, csrf_token: CSRF_TOKEN })
                 });
 
                 if (saveResponse.ok) {

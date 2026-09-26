@@ -8,6 +8,12 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 connect();
+
+// Page personnelle ("Mes flashs") : réservée aux utilisateurs connectés.
+if (empty($_SESSION['login_user'])) {
+    header('Location: adherent.php');
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -332,7 +338,7 @@ connect();
         var dataString = 'inv_name=' + inv_name + '&flash=faux';
         console.log(dataString);
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_flash.php",
             data: dataString,
             cache: false,
@@ -360,7 +366,7 @@ connect();
     function click_to_detruit(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&statusout=detruit';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -374,7 +380,7 @@ connect();
     function click_to_reactive(inv_name) {
         var dataString = 'inv_name=' + inv_name + '&statusout=OK';
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "maj_click/maj_status.php",
             data: dataString,
             cache: false,
@@ -388,7 +394,7 @@ connect();
     function click_to_flash(inv_name) {
     var dataString = 'inv_name=' + inv_name + '&flash=vrai';
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "maj_click/maj_flash.php",
         data: dataString,
         cache: false,
@@ -401,8 +407,8 @@ connect();
     function click_to_flash_multi(list_inv_name) {
         var dataString = 'inv_names=' + list_inv_name ;
         $.ajax({
-            url: 'maj_click/ajout_flash_multi.php', 
-            method: 'GET',
+            url: 'maj_click/ajout_flash_multi.php',
+            method: 'POST',
             data: dataString,
             cache: false,
             success: function (reponse) {
@@ -455,7 +461,7 @@ connect();
 function delete_position_invader_base(inv_name) {
 var dataString = 'inv_name=' + inv_name
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "maj_click/delete_position.php",
         data: dataString,
         cache: false,

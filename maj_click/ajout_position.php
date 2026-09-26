@@ -10,10 +10,16 @@ include_once(__DIR__ . '/../config.php');
 connect();
 session_start();
 
+// Action modifiant des donnees : jeton CSRF obligatoire.
+csrf_check();
+
+// Action reservee aux utilisateurs connectes.
+require_login();
+
 // Recuperation des variables POST
-$inv_name = $_GET['inv_name'];
-$lat = $_GET['lat'];
-$lon = $_GET['lon'];
+$inv_name = $_POST['inv_name'];
+$lat = $_POST['lat'];
+$lon = $_POST['lon'];
 
 #ajout de l'invader
 ajout_position($inv_name, $lat, $lon);
