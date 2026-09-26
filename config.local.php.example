@@ -15,6 +15,7 @@
 
 // $host = Nom d'hote ou adresse IP du serveur de la base de donnees.
 //         Mettre "localhost" si la base est sur le meme serveur que le site.
+//         Avec l'environnement Docker fourni, utiliser "db".
 $host = "localhost";
 
 // $port = Numero du port de connexion a la base de donnees.
