@@ -21,10 +21,6 @@ try {
         throw new Exception('Utilisateur non connecté');
     }
 
-    // Debug : log des données reçues
-    error_log("POST: " . print_r($_POST, true));
-    error_log("FILES: " . print_r($_FILES, true));
-
     // Vérification des données reçues
     if (!isset($_POST['invader']) || !isset($_FILES['photo'])) {
         throw new Exception('Données manquantes');

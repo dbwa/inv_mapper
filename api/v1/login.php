@@ -39,6 +39,12 @@ if (empty($login) || empty($password)) {
     api_error(400, 'missing_credentials', "Les champs 'login' et 'password' sont obligatoires.");
 }
 
+// Limitation des tentatives (anti brute-force)
+$wait = login_attempt_wait($login);
+if ($wait > 0) {
+    api_error(429, 'too_many_attempts', "Trop de tentatives. Reessayez dans $wait secondes.");
+}
+
 $pdo = connect();
 
 // Le site stocke les mots de passe en SHA1 (voir authentificate() dans fonctions.inc.php).
@@ -48,9 +54,12 @@ $stmt->execute([$login, $password]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
+    login_attempt_failure($login);
     // Message volontairement generique : on n'indique pas quel champ est faux.
     api_error(401, 'invalid_credentials', 'Login ou mot de passe incorrect.');
 }
+
+login_attempt_reset($login);
 
 // On limite le nombre de cles actives par utilisateur pour eviter les abus.
 $query = "SELECT COUNT(*) FROM api_keys WHERE user_name = ? AND revoked_at IS NULL";

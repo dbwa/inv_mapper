@@ -19,17 +19,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $remember = isset($_POST['remember']) ? true : false;
-    
-    $auth_result = authentificate($username, $password, $remember);
-    if ($auth_result && is_array($auth_result)) {
-        list($count, $user) = $auth_result;
-        $_SESSION['login_user'] = $user['login'];
-        $_SESSION['login_name'] = $user['name'];
-        $_SESSION['user_type'] = $user['user_type'];
-        header("location: index.php");
-        exit();
+
+    // Limitation des tentatives (anti brute-force)
+    $wait = login_attempt_wait($username);
+    if ($wait > 0) {
+        $error = "Trop de tentatives de connexion. Réessayez dans $wait secondes.";
     } else {
-        $error = "Nom d'utilisateur ou mot de passe incorrect";
+        $auth_result = authentificate($username, $password, $remember);
+        if ($auth_result && is_array($auth_result)) {
+            list($count, $user) = $auth_result;
+            login_attempt_reset($username);
+            $_SESSION['login_user'] = $user['login'];
+            $_SESSION['login_name'] = $user['name'];
+            $_SESSION['user_type'] = $user['user_type'];
+            header("location: index.php");
+            exit();
+        } else {
+            login_attempt_failure($username);
+            $error = "Nom d'utilisateur ou mot de passe incorrect";
+        }
     }
 }
 ?>

@@ -17,6 +17,66 @@ function connect() {
     return $pdo;
 }
 
+// --- Limitation des tentatives de connexion (anti brute-force) ---
+// Après LOGIN_MAX_ATTEMPTS échecs en moins de LOGIN_LOCK_SECONDS secondes,
+// toute nouvelle tentative pour ce login est refusée jusqu'à l'expiration
+// de la fenêtre. Compteur en base (table login_attempts), pas en session :
+// il survit au changement de session et s'applique aussi à l'API.
+
+define('LOGIN_MAX_ATTEMPTS', 3);
+define('LOGIN_LOCK_SECONDS', 60);
+
+function login_attempt_wait($login)
+{
+    try {
+        $pdo = connect();
+        $stmt = $pdo->prepare(
+            "SELECT GREATEST(0, " . LOGIN_LOCK_SECONDS . " - TIMESTAMPDIFF(SECOND, last_attempt, NOW())) AS wait_seconds
+            FROM login_attempts
+            WHERE login = ? AND attempts >= " . LOGIN_MAX_ATTEMPTS . "
+              AND last_attempt > NOW() - INTERVAL " . LOGIN_LOCK_SECONDS . " SECOND"
+        );
+        $stmt->execute([$login]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (int) $row['wait_seconds'] : 0;
+    } catch (PDOException $e) {
+        // Table absente (migration non jouée) : on ne bloque pas la connexion,
+        // l'erreur reste tracée dans les logs.
+        error_log("login_attempts indisponible: " . $e->getMessage());
+        return 0;
+    }
+}
+
+function login_attempt_failure($login)
+{
+    try {
+        $pdo = connect();
+        $stmt = $pdo->prepare(
+            "INSERT INTO login_attempts (login, attempts, last_attempt)
+            VALUES (?, 1, NOW())
+            ON DUPLICATE KEY UPDATE
+              attempts = IF(last_attempt < NOW() - INTERVAL " . LOGIN_LOCK_SECONDS . " SECOND, 1, attempts + 1),
+              last_attempt = NOW()"
+        );
+        $stmt->execute([mb_substr($login, 0, 100)]);
+        // Purge des vieux compteurs pour ne pas grossir indéfiniment.
+        $pdo->prepare("DELETE FROM login_attempts WHERE last_attempt < NOW() - INTERVAL 1 DAY")->execute();
+    } catch (PDOException $e) {
+        error_log("login_attempts indisponible: " . $e->getMessage());
+    }
+}
+
+function login_attempt_reset($login)
+{
+    try {
+        $pdo = connect();
+        $stmt = $pdo->prepare("DELETE FROM login_attempts WHERE login = ?");
+        $stmt->execute([$login]);
+    } catch (PDOException $e) {
+        error_log("login_attempts indisponible: " . $e->getMessage());
+    }
+}
+
 // Authentification d'un utilisateur
 function authentificate($username, $password, $remember = false) {
     $pdo = connect();
