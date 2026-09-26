@@ -34,3 +34,6 @@ config.local.php
 
 # Dump complet de la base : contient des donnees personnelles
 sql/donnees-locales.sql
+
+# Notes de travail personnelles (chemins serveur, details d'infrastructure)
+CLAUDE.md
