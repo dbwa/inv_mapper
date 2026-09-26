@@ -30,7 +30,10 @@ try {
         throw new Exception('Données manquantes');
     }
 
-    $inv_name = $_POST['invader'];
+    $inv_name = basename($_POST['invader']);
+    if (!preg_match('/^[A-Za-z0-9_-]{1,20}$/', $inv_name)) {
+        throw new Exception('Nom d\'invader invalide');
+    }
     $credit = isset($_POST['showCredit']) ? 1 : 0;
     $login = $_SESSION['login_user'];
 

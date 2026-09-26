@@ -37,3 +37,6 @@ sql/donnees-locales.sql
 
 # Notes de travail personnelles (chemins serveur, details d'infrastructure)
 CLAUDE.md
+
+# Rapport d'audit securite interne
+besoin_securite.md

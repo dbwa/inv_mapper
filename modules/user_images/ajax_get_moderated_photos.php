@@ -9,7 +9,11 @@ include_once(__DIR__ . '/../../config.php');
 header('Content-Type: application/json');
 
 // Vérification des droits
-if (!isset($_SESSION['login_user'])) {  // || !user_can_moderate()) {
+if (
+    !isset($_SESSION['login_user']) ||
+    !isset($_SESSION['user_type']) ||
+    $_SESSION['user_type'] !== 'admin'
+) {
     echo json_encode([]);
     exit();
 }

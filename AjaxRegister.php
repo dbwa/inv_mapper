@@ -12,6 +12,11 @@ if (isSet($_GET['username']) && isSet($_GET['password']) && isSet($_GET['pass'])
     $username = $_GET['username'];
     $password = $_GET['password'];
     $pass = $_GET['pass'];  //le code donné en ammont
+
+    if (!preg_match('/^[A-Za-z0-9_][A-Za-z0-9_.-]{1,49}$/', $username)) {
+        exit();
+    }
+
     list($count, $row) = register_user($username, $password, $pass);
 
     if ($count == 1) {

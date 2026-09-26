@@ -266,6 +266,12 @@ function updateStatus(photoId, status) {
 // Chargement dynamique des photos déjà modérées
 let moderatedLoaded = false;
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
 function showModeratedPhotos() {
     if (moderatedLoaded) {
         $('#moderated-section').slideToggle();
@@ -285,31 +291,31 @@ function showModeratedPhotos() {
             for (const inv_name in data) {
                 const inv = data[inv_name];
                 html += `<div class="invader-row">
-                    <h3>${inv_name}</h3>
+                    <h3>${escapeHtml(inv_name)}</h3>
                     <div class="ref-photo">
-                        <img src="${inv.image_ref}" alt="Reference">
+                        <img src="${escapeHtml(inv.image_ref)}" alt="Reference">
                     </div>`;
                 inv.photos.forEach(photo => {
                     let statusLabel = photo.status === 'accepted' ? 'Acceptée' : 'Rejetée';
                     let statusClass = photo.status === 'accepted' ? 'accepted' : 'rejected';
                     html += `
-                    <div class="photo-container ${statusClass}" id="photo-${photo.id}">
+                    <div class="photo-container ${statusClass}" id="photo-${escapeHtml(photo.id)}">
                         <div class="current-status ${statusClass}">${statusLabel}</div>
-                        <img src="${photo.photo_path}" alt="User photo">
+                        <img src="${escapeHtml(photo.photo_path)}" alt="User photo">
                         <div class="action-buttons">
-                            <button onclick="updateStatus(${photo.id}, 'accepted')" 
+                            <button onclick="updateStatus(${escapeHtml(photo.id)}, 'accepted')"
                                     ${photo.status === 'accepted' ? 'disabled' : ''}>
                                 Accepter
                             </button>
-                            <button onclick="updateStatus(${photo.id}, 'rejected')"
+                            <button onclick="updateStatus(${escapeHtml(photo.id)}, 'rejected')"
                                     ${photo.status === 'rejected' ? 'disabled' : ''}>
                                 Rejeter
                             </button>
                         </div>
-                        <div class="photo-meta">Par: ${photo.login}</div>
-                        <div class="photo-meta">Le: ${photo.upload_date}</div>
-                        <div class="photo-meta">Modéré par: ${photo.validated_by || '-'}</div>
-                        <div class="photo-meta">Le: ${photo.validation_date || '-'}</div>
+                        <div class="photo-meta">Par: ${escapeHtml(photo.login)}</div>
+                        <div class="photo-meta">Le: ${escapeHtml(photo.upload_date)}</div>
+                        <div class="photo-meta">Modéré par: ${escapeHtml(photo.validated_by || '-')}</div>
+                        <div class="photo-meta">Le: ${escapeHtml(photo.validation_date || '-')}</div>
                     </div>`;
                 });
                 html += `</div>`;

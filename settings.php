@@ -268,7 +268,7 @@ connect();
             }
 
             // Préparez les données à envoyer au serveur
-            var dataString = 'username=<?php echo $username; ?>&currentpass='+ currentPassword + '&newpassword='+ newPassword;
+            var dataString = 'username=' + encodeURIComponent(<?php echo json_encode((string)$username, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?: '""'; ?>) + '&currentpass='+ currentPassword + '&newpassword='+ newPassword;
             console.log(dataString);
             $.ajax({
                     type: "GET",
