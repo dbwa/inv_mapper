@@ -146,17 +146,48 @@ function require_login()
     }
 }
 
+// --- Mots de passe (cf. besoin_securite.md point 6) ---
+// Le navigateur transmet h1 = SHA1(mot de passe). Côté serveur, deux schémas
+// cohabitent le temps de la migration :
+//   - legacy  : pwd = SHA1(h1)                            (40 caractères hex)
+//   - moderne : pwd = password_hash(SHA1(h1))             (commence par '$',
+//               bcrypt lent + sel unique embarqué, généré par PHP)
+// Le schéma moderne sur-hache le SHA1 stocké (sur-hachage de masse possible
+// sans reconnexion) : toute vérification d'une entrée legacy met donc la
+// ligne à niveau vers bcrypt(SHA1(h1)), aucun mot de passe requis.
+
+function verify_user_password($login, $h1, $stored)
+{
+    if ($stored !== null && str_starts_with($stored, '$')) {
+        return password_verify(sha1($h1), $stored);
+    }
+    if ($stored !== null && hash_equals($stored, sha1($h1))) {
+        try {
+            $stmt = connect()->prepare("UPDATE users SET pwd = ? WHERE login = ?");
+            $stmt->execute([password_hash(sha1($h1), PASSWORD_DEFAULT), $login]);
+        } catch (PDOException $e) {
+            error_log("Mise a niveau du hash impossible: " . $e->getMessage());
+        }
+        return true;
+    }
+    return false;
+}
+
 // Authentification d'un utilisateur
 function authentificate($username, $password, $remember = false) {
     $pdo = connect();
 
-    $query = "SELECT login, name, user_type FROM users WHERE login = ? and pwd = SHA1(?)";
+    // $password est le hash SHA1 calcule par le navigateur (cf. point 6).
+    // La ligne est lue puis verifiee en PHP : le hash stocke peut etre au
+    // schema moderne (password_hash) ou legacy (SHA1 simple).
+    $query = "SELECT login, name, user_type, pwd FROM users WHERE login = ?";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$username, $password]);
+    $stmt->execute([$username]);
     $result = $stmt->fetch();
-    $count = $stmt->rowCount();
 
-    if ($result) {
+    $count = ($result && verify_user_password($username, $password, $result['pwd'])) ? 1 : 0;
+
+    if ($count == 1) {
         // si okay, enregistrer la connexion 
         // Récupérer les informations sur le type d'appareil (mobile ou desktop)
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -232,30 +263,31 @@ function register_user($login, $user_password, $invitcode)
     $code_valide = ($code_requis === '') || hash_equals($code_requis, $code_fourni);
 
     if ($code_valide) {
-        $query = "INSERT INTO users (login, name, pwd)
-            SELECT ?, ?, SHA1(?);";
+        $pwd_hash = password_hash(sha1($user_password), PASSWORD_DEFAULT);
+        $query = "INSERT INTO users (login, name, pwd) VALUES (?, ?, ?);";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$login, $login, $user_password]);
+        $stmt->execute([$login, $login, $pwd_hash]);
 
         $query = "INSERT INTO user_flash (user_name, inv_name, status)
             SELECT ?, 'PA_1', 'flash';";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$login]);
 
-        $query = "SELECT login FROM users WHERE login = ? AND pwd = SHA1(?);";
+        $query = "SELECT login FROM users WHERE login = ? AND pwd = ?;";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$login, $user_password]);
+        $stmt->execute([$login, $pwd_hash]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $count = ($row) ? 1 : 0;
 
         return array($count, $row);
     } else {
+        $pwd_hash = password_hash(sha1($user_password), PASSWORD_DEFAULT);
         $query = "INSERT INTO users (login, name, pwd)
-            SELECT username, ?, SHA1(?)
+            SELECT username, ?, ?
             FROM invit_users
             WHERE username = ? AND invitcode = ? AND status = 'en attente';";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$login, $user_password, $login, $invitcode]);
+        $stmt->execute([$login, $pwd_hash, $login, $invitcode]);
 
         $query = "UPDATE invit_users SET status = 'cree'
             WHERE username = ? AND invitcode = ? AND status = 'en attente';";
@@ -267,9 +299,9 @@ function register_user($login, $user_password, $invitcode)
         $stmt = $pdo->prepare($query);
         $stmt->execute([$login]);
 
-        $query = "SELECT login FROM users WHERE login = ? AND pwd = SHA1(?);";
+        $query = "SELECT login FROM users WHERE login = ? AND pwd = ?;";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$login, $user_password]);
+        $stmt->execute([$login, $pwd_hash]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $count = ($row) ? 1 : 0;
 
@@ -360,22 +392,22 @@ function restore_session_from_cookie() {
 
 // Mise à jour du mot de passe d'un utilisateur
 function update_password($username, $currentpass, $newpassword)
-{   
+{
     include(__DIR__ . '/config.php');
     $pdo = connect();
 
-    // Vérifiez d'abord si le mot de passe actuel est correct
-    $query = "SELECT login, name, user_type FROM users WHERE login = ? and pwd = SHA1(?)";
+    // Vérifiez d'abord si le mot de passe actuel est correct (schéma moderne
+    // ou legacy — voir verify_user_password)
+    $query = "SELECT login, name, user_type, pwd FROM users WHERE login = ?";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$username, $currentpass]);
+    $stmt->execute([$username]);
     $result = $stmt->fetch();
-    $count = $stmt->rowCount();
 
-    if ($result) {
+    if ($result && verify_user_password($username, $currentpass, $result['pwd'])) {
         // Si le mot de passe actuel est correct, mettez à jour avec le nouveau mot de passe
-        $query = "UPDATE users SET pwd = SHA1(?) WHERE login = ?;";
+        $query = "UPDATE users SET pwd = ? WHERE login = ?;";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$newpassword, $username]);
+        $stmt->execute([password_hash(sha1($newpassword), PASSWORD_DEFAULT), $username]);
         return 'password changé';
     } else {
         // Le mot de passe actuel n'est pas correct

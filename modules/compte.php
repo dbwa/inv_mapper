@@ -46,11 +46,11 @@ if (isset($_POST['compte_action']) && !csrf_validate()) {
             $mot_de_passe_aleatoire = bin2hex(random_bytes(32));
 
             $query = "UPDATE users
-                      SET pwd = SHA1(?),
+                      SET pwd = ?,
                           deletion_requested_at = CURRENT_TIMESTAMP
                       WHERE login = ?";
             $stmt = $pdo->prepare($query);
-            $stmt->execute([$mot_de_passe_aleatoire, $username]);
+            $stmt->execute([password_hash(sha1($mot_de_passe_aleatoire), PASSWORD_DEFAULT), $username]);
 
             // On invalide toutes les connexions persistantes de cet utilisateur.
             $query = "DELETE FROM remember_tokens WHERE username = ?";

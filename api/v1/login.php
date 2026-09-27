@@ -47,17 +47,19 @@ if ($wait > 0) {
 
 $pdo = connect();
 
-// Le site stocke les mots de passe en SHA1 (voir authentificate() dans fonctions.inc.php).
-$query = "SELECT login, name, user_type FROM users WHERE login = ? AND pwd = SHA1(?)";
+// Le site recoit le hash SHA1 calcule par le navigateur ; le hash stocke est
+// soit moderne (password_hash), soit legacy (SHA1 simple) - voir point 6.
+$query = "SELECT login, name, user_type, pwd FROM users WHERE login = ?";
 $stmt = $pdo->prepare($query);
-$stmt->execute([$login, $password]);
+$stmt->execute([$login]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$user) {
+if (!$user || !verify_user_password($login, $password, $user['pwd'])) {
     login_attempt_failure($login);
     // Message volontairement generique : on n'indique pas quel champ est faux.
     api_error(401, 'invalid_credentials', 'Login ou mot de passe incorrect.');
 }
+unset($user['pwd']);
 
 login_attempt_reset($login);
 
